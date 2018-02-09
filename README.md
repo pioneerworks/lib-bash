@@ -2,17 +2,23 @@
 
 [![Build Status](https://travis-ci.com/pioneerworks/lib-bash.svg?token=NB4h8vmPKru2tx5DjD9n&branch=master)](https://travis-ci.com/pioneerworks/lib-bash)
 
-This folder contains Homebase Internal BASH Library, which is shared between several projects.  
+This folder contains Homebase Internal BASH Library, which is shared between several projects.
+
+We have adopted the [Google Bash Style Guide](https://google.github.io/styleguide/shell.xml), and it's recommended that anyone committing to this repo reads the guides to understand the conventions, gotchas and anti-patterns.
+
+
+### Whats Here?
 
 The utilities contained herein are of various types, such as:
 
  * array helpers, such as `array-contains-element` function
- * AWS helpers, requires `awscli` and credentials setup.
- * output helpers, such as colored boxes, header and lines
- * file helpers
- * Docker helpers
- * Ruby, sym (encryption) and utility helpers
- * and finally, the *RunLib* — runtime library framework that executes commands, while measuring their duration and following a set of flags to decide what to do on error, and so on.
+ * version helpers, such as functions `lib::util::ver-to-i` which convert a string version like '1.2.0' into an integer that can be used in comparisons; another function `lib::util::i-to-ver` converts an integer back into the string format. This is used, for example, by the auto-incrementing Docker image building tools availble in [`docker.sh`](lib/docker.sh)
+ * [AWS helpers](lib/aws.sh), requires `awscli` and credentials setup.
+ * [output helpers](lib/output.sh), such as colored boxes, header and lines
+ * [file helpers](lib/file.sh)
+ * [Docker helpers](lib/docker.sh)
+ * [Ruby](lib/ruby.sh), [sym](lib/sym.sh) (encryption) and [utility](lib/utility.sh) helpers
+ * and finally, [*RunLib*](lib/run.sh) — a BASH runtime framework that executes commands, while measuring their duration and following a set of flags to decide what to do on error, and so on.
 
 Each library will have a set of private functions, typically named `__lib::util::blah`, and public functions, named as `lib::util::foo`, with shortcuts such as `foo` created when makes sense.
 
