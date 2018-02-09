@@ -11,7 +11,7 @@ if [[ ! -d ${Bats__Root} ]]; then
   cd ${Project__Root}
 fi
 
-source "lib/lib.bash"
+source "lib/Loader.bash"
 source "test/test_helper.bash"
 
 for file in $(ls -1 test/*_test.*); do

@@ -135,9 +135,9 @@ sym::hb::import() {
   echo
   info "Key import was successful, great job! ${bldylw}☺ "
   info "You can test that it works by encrypting, and decrypting a string,"
-  info "just remember to always source ${txtylw}bin/lib.bash${txtblu} first!"
+  info "just remember to always source ${txtylw}bin/Loader.bash${txtblu} first!"
   echo
-  info "\$ ${bldylw}source bin/lib.bash"
+  info "\$ ${bldylw}source bin/Loader.bash"
   info "\$ ${bldylw}hb::encrypt::str hello"
   info "\$ ${bldylw}hb::decrypt::str \$(hb::encrypt::str hello )"
   echo

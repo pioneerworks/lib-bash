@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-[[ -f lib/lib.bash ]] || {
+[[ -f lib/Loader.bash ]] || {
   echo "Please run this from the Project's root"
   (( $_s_ )) && return 1 || exit 1
 }
@@ -14,9 +14,8 @@ lib::bash-source() {
   for bash_file in ${files[@]}; do
     [[ -n ${DEBUG} ]] && printf "sourcing ${txtgrn}$bash_file${clr}...\n" >&2
     set +e
-    [[ ${bash_file} != "lib/lib.bash" ]] && source ${bash_file}
+    [[ ${bash_file} != "lib/Loader.bash" ]] && source ${bash_file}
   done
 }
 
 lib::bash-source "lib"
-

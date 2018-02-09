@@ -2,7 +2,9 @@
 
 [![Build Status](https://travis-ci.com/pioneerworks/lib-bash.svg?token=NB4h8vmPKru2tx5DjD9n&branch=master)](https://travis-ci.com/pioneerworks/lib-bash)
 
-This folder contains BASH library shared by several projects. The utilities contained herein are of various types, such as:
+This folder contains Homebase Internal BASH Library, which is shared between several projects.  
+
+The utilities contained herein are of various types, such as:
 
  * array helpers, such as `array-contains-element` function
  * AWS helpers, requires `awscli` and credentials setup.
@@ -34,13 +36,13 @@ Your scripts should almost always start with:
 
 # This verifies you are running the script from RAILS_ROOT, because
 # otherwise it's hard to find and load BASH libraries:
-[[ -f "./config.ru" ]] || {
+[[ -f "lib/Loader.bashu" ]] || {
   echo "You should be running this from the RAILS_ROOT folder"
   (( $_s_ )) && return 1 || exit 1
 }
 
 # Finally, this loads all the bash libraries:
-[[ -f lib/lib.bash  ]] && source lib/lib.bash
+[[ -f lib/Loader.bash  ]] && source lib/Loader.bash
 ```
 
 ### Naming Conventions
