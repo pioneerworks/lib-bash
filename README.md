@@ -6,7 +6,6 @@ This folder contains Homebase Internal BASH Library, which is shared between sev
 
 We have adopted the [Google Bash Style Guide](https://google.github.io/styleguide/shell.xml), and it's recommended that anyone committing to this repo reads the guides to understand the conventions, gotchas and anti-patterns.
 
-
 ### Whats Here?
 
 The utilities contained herein are of various types, such as:
@@ -23,6 +22,36 @@ The utilities contained herein are of various types, such as:
 Each library will have a set of private functions, typically named `__lib::util::blah`, and public functions, named as `lib::util::foo`, with shortcuts such as `foo` created when makes sense.
 
 ## Usage
+
+### How to integrate it with your project?
+
+1. Add `bin/lib-bash` to `.gitignore`
+2. In your common bash helper, eg. `bin/lib.bash`, add the following code:
+
+```bash
+
+lib::bash-source() {
+  local folder=${1}
+  declare -a files=($(ls -1 ${folder}/*.sh))
+  for bash_file in ${files[@]}; do
+    [[ -n ${DEBUG} ]] && printf "sourcing ${txtgrn}$bash_file${clr}...\n" >&2
+    set +e
+    source ${bash_file}
+  done
+}
+
+lib::bash-lib-install() {
+  set -e
+  [[ -d ../lib-bash ]] || {
+    git clone git@github.com:pioneerworks/lib-bash.git ../lib-bash
+  }
+  ln -nfs ../../lib-bash/lib/ bin/lib-bash
+  set +e
+}
+
+[[ -L bin/lib-bash ]] || lib::bash-lib-install
+lib::bash-source "bin/lib-bash"
+```
 
 ### Writing Scripts that use the Library Functions
 
