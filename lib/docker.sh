@@ -102,9 +102,7 @@ lib::docker::actions::push() {
   local tag=${1:-$(__lib::docker::next-version)}
 
   lib::docker::actions::tag latest
-
   [[ -n ${tag} ]] && lib::docker::actions::tag ${tag}
-
   __lib::docker::exec docker push "${HomebaseDockerRepo}:${tag}"
 
   [[ ${tag} != 'latest' ]] && __lib::docker::exec docker push "${HomebaseDockerRepo}:latest"

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+export LibBash__LibFolder=${1:-"lib-bash"}
+export LibBash__InstallationFolder="bin/${LibBash__LibFolder}"
+export LibBash__GitDestinationFolder="../${LibBash__LibFolder}"
+export LibBash__GitUrl="git@github.com:pioneerworks/lib-bash.git"
+
+lib::bash::source() {
+  local folder=${1}
+  declare -a files=($(ls -1 ${folder}/*.sh))
+  for bash_file in ${files[@]}; do source ${bash_file}; done
+}
+
+lib::bash::lib-install() {
+  printf "starting up...\n"
+  set -e
+  [[ -d "${LibBash__GitDestinationFolder}" ]] || git clone ${LibBash__GitUrl} ${LibBash__GitDestinationFolder}
+  [[ -L "${LibBash__InstallationFolder}" ]] || ln -nfs ../${LibBash__GitDestinationFolder}/lib/ ${LibBash__InstallationFolder}
+  set +e
+}
+
+lib::bash::lib-install
+lib::bash::source ${LibBash__InstallationFolder}
+

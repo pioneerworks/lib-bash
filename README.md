@@ -29,29 +29,10 @@ Each library will have a set of private functions, typically named `__lib::util:
 2. In your common bash helper, eg. `bin/lib.bash`, add the following code:
 
 ```bash
-
-lib::bash-source() {
-  local folder=${1}
-  declare -a files=($(ls -1 ${folder}/*.sh))
-  for bash_file in ${files[@]}; do
-    [[ -n ${DEBUG} ]] && printf "sourcing ${txtgrn}$bash_file${clr}...\n" >&2
-    set +e
-    source ${bash_file}
-  done
-}
-
-lib::bash-lib-install() {
-  set -e
-  [[ -d ../lib-bash ]] || {
-    git clone git@github.com:pioneerworks/lib-bash.git ../lib-bash
-  }
-  ln -nfs ../../lib-bash/lib/ bin/lib-bash
-  set +e
-}
-
-[[ -L bin/lib-bash ]] || lib::bash-lib-install
-lib::bash-source "bin/lib-bash"
+curl -fsSL "https://github.com/pioneerworks/lib-bash/blob/master/bin/bootstrap" | /usr/bin/env bash
 ```
+
+The code above will automatically checkout this repo under `bin/lib-bash`, and load all files from the `lib` subdirectory of the project.
 
 ### Writing Scripts that use the Library Functions
 
