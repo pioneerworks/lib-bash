@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+Project__Root=$(pwd)
+Bats__Root=${Project__Root}/.bats
+[[ ${PATH} =~ ${Project__Root} ]] || export PATH="${Project__Root}/bin:${PATH}"
+
+if [[ ! -d ${Bats__Root} ]]; then
+  git clone https://github.com/sstephenson/bats.git ${Bats__Root}
+  cd ${Bats__Root}
+  ./install.sh ${Project__Root}
+  cd ${Project__Root}
+fi
+
+source "lib/lib.bash"
+source "test/test_helper.bash"
+
+for file in $(ls -1 test/*_test.*); do
+  bats -p "${file}"
+done

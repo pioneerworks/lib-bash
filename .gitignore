@@ -1,4 +1,8 @@
+bin/bats
+libexec
+share
 *.gem
+.bats
 *.rbc
 /.config
 /coverage/

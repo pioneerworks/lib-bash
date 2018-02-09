@@ -1,0 +1,5 @@
+language: c
+script: bin/specs
+notifications:
+  email:
+    on_success: never
