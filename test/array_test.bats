@@ -1,7 +1,5 @@
 load test_helper
 
-
-
 @test "array-contains-element when element exists, using return value" {
   declare -a array=("a string" "test2000" "hello" "one")
   run $(array-contains-element test2000 "${array[@]}")
