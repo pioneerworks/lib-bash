@@ -29,7 +29,7 @@ Each library will have a set of private functions, typically named `__lib::util:
 2. In your common bash helper, eg. `bin/lib.bash`, add the following code:
 
 ```bash
-curl -fsSL "https://github.com/pioneerworks/lib-bash/blob/master/bin/bootstrap" | /usr/bin/env bash
+curl -fsSL "https://raw.githubusercontent.com/pioneerworks/lib-bash/master/bin/bootstrap" | /usr/bin/env bash -x
 ```
 
 The code above will automatically checkout this repo under `bin/lib-bash`, and load all files from the `lib` subdirectory of the project.
