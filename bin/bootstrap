@@ -14,6 +14,11 @@ lib::bash::source() {
 lib::bash::lib-install() {
   set -e
   [[ -d "${LibBash__GitDestinationFolder}" ]] || git clone ${LibBash__GitUrl} ${LibBash__GitDestinationFolder}
+  [[ -d "${LibBash__GitDestinationFolder}" ]] && {
+    cd ${LibBash__GitDestinationFolder}
+    git pull --rebase
+    cd -
+  }
   [[ -L "${LibBash__InstallationFolder}" ]] || ln -nfs ../${LibBash__GitDestinationFolder}/lib/ ${LibBash__InstallationFolder}
   set +e
 }
