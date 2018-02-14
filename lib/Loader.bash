@@ -1,15 +1,19 @@
 #!/usr/bin/env bash
 
-[[ -f lib/Loader.bash ]] || {
-  echo "Please run this from the Project's root"
+export LibBash__SearchTarget="Loader.bash"
+export LibBash__Loader=$(find -L . -maxdepth 3 -type f -name "${LibBash__SearchTarget}" -print 2>/dev/null)
+if [[ -z ${LibBash__Loader} ]]; then
+  printf "${bldred}ERROR: ${clr}Can not find ${bldylw}${LibBash__SearchTarget}${clr} file, aborting."
   (( $_s_ )) && return 1 || exit 1
-}
+fi
+
+export LibBash__LibDir=$(dirname ${LibBash__Loader})
 
 lib::bash-source() {
   local folder=${1}
 
   # Let's list all lib files
-  declare -a files=($(ls -1 ${folder}/*.*sh))
+  declare -a files=($(ls -1 ${folder}/*.sh))
 
   for bash_file in ${files[@]}; do
     [[ -n ${DEBUG} ]] && printf "sourcing ${txtgrn}$bash_file${clr}...\n" >&2
@@ -18,4 +22,4 @@ lib::bash-source() {
   done
 }
 
-lib::bash-source "lib"
+lib::bash-source ${LibBash__LibDir}
