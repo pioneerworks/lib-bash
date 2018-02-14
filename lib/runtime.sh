@@ -93,7 +93,7 @@ __lib::run::exec() {
   command="$*"
 
   if [[ ${LibRun__Verbose} -eq ${True} ]] ; then
-    lib::run::inspect
+    lib::run::inspect "config" "totals"
     hr
   fi
 
@@ -208,17 +208,23 @@ lib::run::ask() {
 }
 
 lib::run::inspect() {
-  info "\n${bldylw}CONFIGURATION:"
-  info "${bldylw}${LibRun__AbortOnError__Default}${txtblu} == LibRun__AbortOnError__Default"
-  info "${bldylw}${LibRun__AbortOnError}${txtblu} == LibRun__AbortOnError\n"
-  info "${bldylw}${LibRun__DryRun}${txtblu} == LibRun__DryRun"
-  info "${bldylw}${LibRun__Verbose}${txtblu} == LibRun__Verbose"
-  info "${bldylw}${LibRun__LastExitCode}${txtblu} == LibRun__LastExitCode"
-  info "${bldylw}${LibRun__ShowCommandOutput}${txtblu} == LibRun__ShowCommandOutput"
-  info "\n${bldylw}TOTALS:${clr}"
-  info "${bldgrn}${commands_completed}${txtblu} commands completed successfully,"
-  info "${bldred}${commands_failed}${txtblu} failed commands, and "
-  info "${bldylw}${commands_ignored}${txtblu} failed commands have been ignored."
+
+  if [[ $(array-contains-element config "$@") == "true" ]]; then
+    info "\n${bldylw}CONFIGURATION:"
+    info "${bldylw}${LibRun__AbortOnError__Default}${txtblu} == LibRun__AbortOnError__Default"
+    info "${bldylw}${LibRun__AbortOnError}${txtblu} == LibRun__AbortOnError\n"
+    info "${bldylw}${LibRun__DryRun}${txtblu} == LibRun__DryRun"
+    info "${bldylw}${LibRun__Verbose}${txtblu} == LibRun__Verbose"
+    info "${bldylw}${LibRun__LastExitCode}${txtblu} == LibRun__LastExitCode"
+    info "${bldylw}${LibRun__ShowCommandOutput}${txtblu} == LibRun__ShowCommandOutput"
+  fi
+
+  if [[ $(array-contains-element "totals" "$@") == "true" ]]; then
+    info "\n${bldylw}TOTALS:${clr}"
+    info "${bldgrn}${commands_completed}${txtblu} commands completed successfully,"
+    info "${bldred}${commands_failed}${txtblu} failed commands, and "
+    info "${bldylw}${commands_ignored}${txtblu} failed commands have been ignored."
+  fi
 }
 
 lib::run() {

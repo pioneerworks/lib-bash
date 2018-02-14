@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+export True=1
+export False=0
+
 export LibBash__SearchTarget="Loader.bash"
 export LibBash__Loader=$(find -L . -maxdepth 3 -type f -name "${LibBash__SearchTarget}" -print 2>/dev/null)
 if [[ -z ${LibBash__Loader} ]]; then
@@ -21,5 +24,7 @@ lib::bash-source() {
     [[ ${bash_file} != "lib/Loader.bash" ]] && source ${bash_file}
   done
 }
+
+[[ -f ${LibBash__LibDir}/settings.sh ]] && source ${LibBash__LibDir}/settings.sh
 
 lib::bash-source ${LibBash__LibDir}
