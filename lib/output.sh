@@ -211,6 +211,19 @@ __lib::output::center() {
   cursor.at.x -1
 }
 
+__lib::output::left-justify() {
+  local color="${1}"
+  shift
+  local text="$*"
+  printf "${color}"
+  local width=$(( $(__lib::output::screen-width) / 2 ))
+  [[ ${width} -lt 70 ]] && width=70
+  __lib::output::repeat-char " " ${width}
+  cursor.at.x 2
+  printf "« ${text} »"
+  printf "${clr}\n\n"
+}
+
 ################################################################################
 # Public functions
 ################################################################################
@@ -220,6 +233,9 @@ __lib::output::center() {
 #    eg: center "${bakred}${txtwht}" "Welcome Friends!"
 center() {
   __lib::output::center "$@"
+}
+left() {
+  __lib::output::left-justify "$@"
 }
 
 cursor.at.x() {
@@ -290,6 +306,14 @@ box::magenta-in-blue() {
   __lib::output::box "${bldblu}" "${bldpur}" "$@"
 }
 
+hl::yellow() {
+  left "${txtblk}${bakylw}" "$@"
+}
+
+hl::subtle() {
+  left "${bldcyn}${bakblk}${underlined}" "$@"
+}
+
 h::yellow() {
   center "${txtblk}${bakylw}" "$@"
 }
@@ -303,7 +327,11 @@ h::green() {
 }
 
 h::blue() {
-  center "${txtwht}${bakblu}" "$@"
+  center "${txtblk}${bakblu}" "$@"
+}
+
+h::black() {
+  center "${bldylw}${bakblk}" "$@"
 }
 
 h1::green() {

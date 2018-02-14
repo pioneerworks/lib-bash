@@ -93,7 +93,7 @@ __lib::run::exec() {
   command="$*"
 
   if [[ ${LibRun__Verbose} -eq ${True} ]] ; then
-    lib::run::inspect "config" "totals"
+    lib::run::inspect
     hr
   fi
 
@@ -207,24 +207,68 @@ lib::run::ask() {
   fi
 }
 
+lib::run::inspect-variable() {
+  local var_name=${1}
+  local print_value=${2}
+  local var_value=${!var_name}
+  local value=""
+  (( ${var_value} )) && { value=" ✔︎ "; color=${bldgrn};  }
+  (( ${var_value} )) || { value=" ✘ "; color="${bldpur}"; }
+
+  printf "    ${color}%-30s = " ${var_name}
+  if [[ -n ${print_value} ]]; then
+    printf " ${var_value}"
+  else
+    printf  "${value}"
+  fi
+  printf "${clr}\n"
+}
+
+lib::run::print-variable() {
+  lib::run::inspect-variable $1 true
+}
+
+lib::run::inspect-variables() {
+  local title=${1}; shift
+  hl::subtle "${title}"
+  for var in $@; do
+    lib::run::inspect-variable ${var}
+  done
+  [[ ${#@} -gt 0 ]] && echo
+}
+
+lib::run::print-variables() {
+  local title=${1}; shift
+  hl::subtle "${title}"
+  for var in $@; do
+    lib::run::print-variable ${var}
+  done
+  [[ ${#@} -gt 0 ]] && echo
+}
+
 lib::run::inspect() {
-
-  if [[ $(array-contains-element config "$@") == "true" ]]; then
-    info "\n${bldylw}CONFIGURATION:"
-    info "${bldylw}${LibRun__AbortOnError__Default}${txtblu} == LibRun__AbortOnError__Default"
-    info "${bldylw}${LibRun__AbortOnError}${txtblu} == LibRun__AbortOnError\n"
-    info "${bldylw}${LibRun__DryRun}${txtblu} == LibRun__DryRun"
-    info "${bldylw}${LibRun__Verbose}${txtblu} == LibRun__Verbose"
-    info "${bldylw}${LibRun__LastExitCode}${txtblu} == LibRun__LastExitCode"
-    info "${bldylw}${LibRun__ShowCommandOutput}${txtblu} == LibRun__ShowCommandOutput"
+  if [[ ${#@} -eq 0 || $(array-contains-element config "$@") == "true" ]]; then
+    lib::run::inspect-variables "CONFIGURATION" \
+      LibRun__AbortOnError__Default \
+      LibRun__AbortOnError \
+      LibRun__ShowCommandOutput \
+      LibRun__DryRun \
+      LibRun__Verbose
   fi
 
-  if [[ $(array-contains-element "totals" "$@") == "true" ]]; then
-    info "\n${bldylw}TOTALS:${clr}"
-    info "${bldgrn}${commands_completed}${txtblu} commands completed successfully,"
-    info "${bldred}${commands_failed}${txtblu} failed commands, and "
-    info "${bldylw}${commands_ignored}${txtblu} failed commands have been ignored."
+  if [[ ${#@} -eq 0 || $(array-contains-element "totals" "$@") == "true" ]]; then
+    hl::subtle "TOTALS"
+    info "${bldgrn}${commands_completed} commands completed successfully"
+    [[ ${commands_failed} -gt 0 ]] && info "${bldred}${commands_failed} commands failed"
+    [[ ${commands_ignored} -gt 0 ]] && info "${bldylw}${commands_ignored} commands failed, but were ignored."
+    echo
   fi
+
+  if [[ ${#@} -eq 0 || $(array-contains-element "current" "$@") == "true" ]]; then
+    lib::run::print-variables "LAST COMMAND" \
+      LibRun__LastExitCode
+  fi
+  echo
 }
 
 lib::run() {
