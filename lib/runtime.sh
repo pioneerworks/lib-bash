@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-##——————————————————————————————————————————————————————————————————————————————
-## © 2016-2017 Author: Konstantin Gredeskoul
-## Ported from the licensed under the MIT license Project Pullulant, at
-## https://github.com/kigster/pullulant
-##
-## Any modifications, © 2017 PioneerWorks, Inc. All rights reserved.
-##——————————————————————————————————————————————————————————————————————————————
+#——————————————————————————————————————————————————————————————————————————————
+# © 2016-2017 Author: Konstantin Gredeskoul
+# Ported from the licensed under the MIT license Project Pullulant, at
+# https://github.com/kigster/pullulant
+#
+# Any modifications, © 2017 PioneerWorks, Inc. All rights reserved.
+#——————————————————————————————————————————————————————————————————————————————
 
 # This variable is set by each call to #run()
 export LibRun__LastExitCode=${False}
@@ -78,16 +78,6 @@ __lib::run::bundle::exec() {
     return 0
   else
     __lib::run::exec "bundle exec ${cmd}"
-  fi
-}
-
-# This prints
-__lib::run::millis() {
-  if [[ ${HomebaseCurrentOS} == "Darwin" ]] ; then
-    [[ -z $(which gdate) ]] && (lib::brew::install::package coreutils) 1>&2
-    printf $(($(gdate +%s%N)/1000000))
-  else
-    printf $(($(date +%s%N)/1000000))
   fi
 }
 
@@ -234,11 +224,6 @@ lib::run::inspect() {
 lib::run() {
   __lib::run $@
   return ${LibRun__LastExitCode}
-}
-
-
-millis() {
-  __lib::run::millis
 }
 
 with-min-duration() {

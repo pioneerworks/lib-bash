@@ -44,7 +44,7 @@ lib::output::color::off() {
 }
 
 __lib::output::screen-width() {
-  if [[ $(uname -s ) == 'Darwin' ]]; then
+  if [[ ${HomebaseCurrentOS:-$(uname -s)} == 'Darwin' ]]; then
     w=$(stty -a | grep columns | awk '{print $6}')
   elif [[ ${HomebaseCurrentOS} == 'Linux' ]]; then
     w=$(stty -a | grep columns | awk '{print $7}' | sed 's/;//g')
@@ -57,7 +57,7 @@ __lib::output::screen-width() {
 }
 
 __lib::output::screen-height() {
-  if [[ $(uname -s ) == 'Darwin' ]]; then
+  if [[ ${HomebaseCurrentOS:-$(uname -s)} == 'Darwin' ]]; then
     h=$(stty -a | grep rows | awk '{print $4}')
   elif [[ ${HomebaseCurrentOS} == 'Linux' ]]; then
     h=$(stty -a | grep rows | awk '{print $5}' | sed 's/;//g')

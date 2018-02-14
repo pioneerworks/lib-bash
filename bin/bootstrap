@@ -4,6 +4,7 @@ export LibBash__LibFolder=${1:-"lib-bash"}
 export LibBash__InstallationFolder="bin/${LibBash__LibFolder}"
 export LibBash__GitDestinationFolder="../${LibBash__LibFolder}"
 export LibBash__GitUrl="git@github.com:pioneerworks/lib-bash.git"
+export LibBash__RebaseEvery=3600 # seconds
 
 lib::bash::source() {
   local folder=${1}
@@ -12,16 +13,39 @@ lib::bash::source() {
 }
 
 lib::bash::lib-install() {
-  set -e
-  [[ -d "${LibBash__GitDestinationFolder}" ]] || git clone ${LibBash__GitUrl} ${LibBash__GitDestinationFolder} 2>/dev/null 1>/dev/null
+  local __home=$(pwd)
+  [[ -d "${LibBash__GitDestinationFolder}" ]] || git clone ${LibBash__GitUrl} ${LibBash__GitDestinationFolder} 2>&1 | cat > /dev/null
   [[ -d "${LibBash__GitDestinationFolder}" ]] && {
     cd ${LibBash__GitDestinationFolder}
-    git pull --rebase 2>/dev/null 1>/dev/null
-    cd - 1>/dev/null
+    if [[ ${LibBash__LastRebaseAt} -gt 0 ]]; then
+      local now=$(epoch)
+      local sinceLast=$((${now} - ${LibBash__LastRebaseAt}))
+      if [[ ${sinceLast} -gt ${LibBash__RebaseEvery} ]]; then
+        export LibBash__LastRebaseAt=${now}
+        printf "    ⇨ ${bldylw}Updating lib-bash to latest...${clr}\n" >&2
+        set -e
+        git pull --rebase 2>/dev/null 1>/dev/null
+      fi
+    fi
   }
-  [[ -L "${LibBash__InstallationFolder}" ]] || ln -nfs ../${LibBash__GitDestinationFolder}/lib/ ${LibBash__InstallationFolder} 2>/dev/null 1>/dev/null
+
+  cd ${__home} 1>/dev/null
+  [[ -L "${LibBash__InstallationFolder}" ]] || ln -nfs ../${LibBash__GitDestinationFolder}/lib/ ${LibBash__InstallationFolder} 2>&1 | cat > /dev/null
   set +e
 }
 
+lib::bash::gitignore() {
+  [[ -s .gitignore ]] || return
+
+  declare -a __installed=(${LibBash__InstallationFolder} bin/bootstrap)
+
+  for ignored in ${__installed[@]}; do
+    if [[ -z $(grep ${ignored} .gitignore) ]]; then
+      echo ${ignored} >> .gitignore
+    fi
+  done
+}
+
 lib::bash::lib-install
+lib::bash::gitignore
 lib::bash::source ${LibBash__InstallationFolder}
