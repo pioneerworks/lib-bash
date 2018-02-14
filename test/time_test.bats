@@ -9,7 +9,7 @@ load test_helper
   [[ ${now} -gt 0 ]]
   [[ ${now} -gt ${then} ]]
   [[ $(( ${now} - ${then})) -gt 100 ]]
-  [[ $(( ${now} - ${then})) -lt 200 ]]
+  [[ $(( ${now} - ${then})) -lt 300 ]]
 }
 
 @test "epoch()" {
