@@ -1,6 +1,6 @@
 load test_helper
 
-@test "Run with a successful command and defaults" {
+@test "run() with a successful command and defaults" {
   source lib/runtime.sh
   export LibRun__DryRun=${True}
   run lib::run "ls"
@@ -8,7 +8,7 @@ load test_helper
   [[ "${LibRun__LastExitCode}" -eq 0 ]]
 }
 
-@test "Run with a unsuccessful command and defaults" {
+@test "run() with an unsuccessful command and defaults" {
   source lib/runtime.sh
   export LibRun__DryRun=${False}
   run "lib::run lssdf"

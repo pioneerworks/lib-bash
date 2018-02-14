@@ -1,5 +1,6 @@
 ## LIB-BASH — Reusable BASH components with automated tests
 
+
 [![Build Status](https://travis-ci.com/pioneerworks/lib-bash.svg?token=NB4h8vmPKru2tx5DjD9n&branch=master)](https://travis-ci.com/pioneerworks/lib-bash)
 
 This folder contains Homebase Internal BASH Library, which is shared between several projects.

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-##———————————————————————————————————————————————————————————————————————————————
-## © 2016 — 2017 Author: Konstantin Gredeskoul
-## Ported from the licensed under the MIT license Project Pullulant, at
-## https://github.com/kigster/pullulant
-##
-## Any modifications, © 2017 PioneerWorks, Inc. All rights reserved.
-##———————————————————————————————————————————————————————————————————————————————
+#———————————————————————————————————————————————————————————————————————————————
+# © 2016 — 2017 Author: Konstantin Gredeskoul
+# Ported from the licensed under the MIT license Project Pullulant, at
+# https://github.com/kigster/pullulant
+#
+# Any modifications, © 2017 PioneerWorks, Inc. All rights reserved.
+#———————————————————————————————————————————————————————————————————————————————
 
 lib::brew::upgrade() {
   if [[ -z "$(which brew)" ]]; then
