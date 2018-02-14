@@ -21,7 +21,7 @@ lib::bash-source() {
   for bash_file in ${files[@]}; do
     [[ -n ${DEBUG} ]] && printf "sourcing ${txtgrn}$bash_file${clr}...\n" >&2
     set +e
-    [[ ${bash_file} != "lib/Loader.bash" ]] && source ${bash_file}
+    [[ $(basename ${bash_file}) == "Loader.bash" ]] || source ${bash_file}
   done
 }
 
