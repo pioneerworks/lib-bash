@@ -5,6 +5,7 @@ export LibBash__InstallationFolder="bin/${LibBash__LibFolder}"
 export LibBash__GitDestinationFolder="../${LibBash__LibFolder}"
 export LibBash__GitUrl="git@github.com:pioneerworks/lib-bash.git"
 export LibBash__RebaseEvery=3600 # seconds
+export LibBash__LastRebaseAt=1 # seconds
 
 lib::bash::source() {
   local folder=${1}
