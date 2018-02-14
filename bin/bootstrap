@@ -13,6 +13,10 @@ lib::bash::source() {
   for bash_file in ${files[@]}; do source ${bash_file}; done
 }
 
+epoch() {
+  date +%s
+}
+
 lib::bash::lib-install() {
   local __home=$(pwd)
   [[ -d "${LibBash__GitDestinationFolder}" ]] || git clone ${LibBash__GitUrl} ${LibBash__GitDestinationFolder} 2>&1 | cat > /dev/null
@@ -23,7 +27,7 @@ lib::bash::lib-install() {
       local sinceLast=$((${now} - ${LibBash__LastRebaseAt}))
       if [[ ${sinceLast} -gt ${LibBash__RebaseEvery} ]]; then
         export LibBash__LastRebaseAt=${now}
-        printf "    ⇨ ${bldylw}Updating lib-bash to latest...${clr}\n" >&2
+        printf "    ⇨ ${bldblu}lib-bash is outdated, updating...${clr}\n" >&2
         set -e
         git pull --rebase 2>/dev/null 1>/dev/null
       fi
