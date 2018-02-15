@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+export TERM=${TERM:-xterm-256color}
 Project__Root=$(pwd)
 Bats__Root=${Project__Root}/.bats
 [[ ${PATH} =~ ${Project__Root} ]] || export PATH="${Project__Root}/bin:${PATH}"
