@@ -27,16 +27,24 @@ lib::bash::lib-install() {
       local sinceLast=$((${now} - ${LibBash__LastRebaseAt}))
       if [[ ${sinceLast} -gt ${LibBash__RebaseEvery} ]]; then
         export LibBash__LastRebaseAt=${now}
-        printf "    ⇨ ${bldblu}lib-bash is outdated, updating...${clr}\n" >&2
-        set -e
+        printf "⇨ ${bldblu}lib-bash may be outdated, updating...${clr}\n" >&2
         git pull --rebase 2>/dev/null 1>/dev/null
+        code=$?
+        if [[ ${code} == 128 ]]; then
+          printf "${bldylw}Warning: unable to do ${bldblu}git pull --rebase${bldylw} inside ../lib-bash${clr}\n"
+          printf "Do you have local changes there? Please check ${bldylw}../lib-bash${clr} folder.\n"
+          exit ${code}
+        elif [[ ${code} != 0 ]]; then
+          printf "${bldylw}Warning: unable to do ${bldblu}git pull --rebase${bldylw} inside ../lib-bash${clr}\n"
+          printf "Exit code is ${code}\n"
+          exit ${code}
+        fi
       fi
     fi
   }
 
   cd ${__home} 1>/dev/null
   [[ -L "${LibBash__InstallationFolder}" ]] || ln -nfs ../${LibBash__GitDestinationFolder}/lib/ ${LibBash__InstallationFolder} 2>&1 | cat > /dev/null
-  set +e
 }
 
 lib::bash::gitignore() {

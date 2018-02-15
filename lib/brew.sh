@@ -83,6 +83,27 @@ lib::brew::install::package() {
   fi
 }
 
+lib::brew::install::cask() {
+  local package=$1
+  local force=
+  local verbose=
+
+  [[ -n ${opts_force} ]] && force="--force"
+  [[ -n ${opts_verbose} ]] && verbose="--verbose"
+
+  inf "verifying brew package ${bldylw}${package}"
+  if [[ -n $(brew cask list | grep ${package}) ]]; then
+    ok:
+    run "brew update ${package} ${force} ${verbose}"
+  else
+    kind_of_ok:
+    run "brew cask install ${package} ${force} ${verbose}"
+    if [[ ${LibRun__LastExitCode} != 0 ]]; then
+      warning "${package} failed to install, attempting to overwrite"
+    fi
+  fi
+}
+
 lib::brew::uninstall::package() {
   local package=$1
   local force=
