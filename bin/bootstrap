@@ -20,7 +20,7 @@ epoch() {
 lib::bash::lib-install() {
   local __home=$(pwd)
   [[ -d "${LibBash__GitDestinationFolder}" ]] || git clone ${LibBash__GitUrl} ${LibBash__GitDestinationFolder} 2>&1 | cat > /dev/null
-  [[ -d "${LibBash__GitDestinationFolder}" ]] && {
+  [[ -z ${CI} && -d "${LibBash__GitDestinationFolder}" ]] && {
     cd ${LibBash__GitDestinationFolder}
     if [[ ${LibBash__LastRebaseAt} -gt 0 ]]; then
       local now=$(epoch)
