@@ -26,18 +26,9 @@ __lib::docker::reset-colors() {
 
 __lib::docker::exec() {
   local cmd="$*"
-  info "[boot] ${bldylw}${cmd}"
-  __lib::docker::output-colors
-  ${cmd}
-  code=$?
-  if [[ ${code} != 0 ]]; then
-    error: "[done] ${bldylw}${cmd}"
-    error  "[done] command exited with code ${bldylw}${code}"
-    return ${code}
-  else
-    info: "[done] ${bldylw}${cmd}"
-  fi
-  __lib::docker::reset-colors
+  export LibRun__ShowCommandOutput=${True}
+  export LibRun__AbortOnError=${True}
+  run "${cmd}"
   echo
 }
 
@@ -58,13 +49,18 @@ __lib::docker::next-version() {
   local vi=$(( $(lib::util::ver-to-i ${version}) + 1 ))
   printf $(lib::util::i-to-ver ${vi})
 }
+
+
 #===============================================================================
 # Public Functions
 #===============================================================================
+lib::docker::build::container() {
+  __lib::docker::exec "docker build  -m 2G --pull -t homebase/homebase1-container . $*"
+}
 
 # Docker Actions
 lib::docker::actions::build() {
-  __lib::docker::exec "docker-compose build -m 1G --force-rm --pull"
+  lib::docker::build::container "$@"
 }
 
 lib::docker::actions::clean() {
