@@ -212,6 +212,8 @@ lib::run::inspect-variable() {
   local var_value=${!var_name}
   local value=""
 
+  local avail_len=$(($(screen.width) - 45))
+
   if [[ -n "${var_value}" && "${var_value}" == "${True}" ]] ; then
     value=" ✔︎ "
     color="${bldgrn}"
@@ -224,10 +226,10 @@ lib::run::inspect-variable() {
   fi
 
   printf "    ${bldylw}%-40s = ${color}" ${var_name}
-  if [[ -n ${print_value} ]]; then
-    printf " ${var_value}"
+  if [[ -n "${print_value}" ]]; then
+    printf "%-*.*s" ${avail_len} ${avail_len} "${var_value}"
   else
-    printf  "${value}"
+    printf "%-*.*s" ${avail_len} ${avail_len} "${value}"
   fi
   printf "${clr}\n"
 }
@@ -259,6 +261,9 @@ lib::run::inspect() {
     lib::run::inspect-variables "CONFIGURATION" \
       LibRun__AbortOnError__Default \
       LibRun__AbortOnError \
+      LibRun__AskOnError__Default \
+      LibRun__AskOnError \
+      LibRun__ShowCommandOutput__Default \
       LibRun__ShowCommandOutput \
       LibRun__DryRun \
       LibRun__Verbose

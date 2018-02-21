@@ -216,12 +216,21 @@ __lib::output::left-justify() {
   shift
   local text="$*"
   printf "${color}"
-  local width=$(( $(__lib::output::screen-width) / 2 ))
-  [[ ${width} -lt 70 ]] && width=70
-  __lib::output::repeat-char " " ${width}
-  cursor.at.x 2
-  printf "« ${text} »"
-  printf "${clr}\n\n"
+
+  ( lib::output::is_terminal ) && {
+    local width=$(( $(__lib::output::screen-width) / 2 ))
+    [[ ${width} -lt 60 ]] && width="60"
+    __lib::output::repeat-char " " ${width}
+    cursor.at.x 2
+    printf "« ${text} »"
+    printf "${clr}\n\n"
+  }
+
+  ( lib::output::is_terminal ) || {
+    printf "  « ${text} »"
+    printf "  ${clr}\n\n"
+  }
+
 }
 
 ################################################################################
@@ -234,6 +243,7 @@ __lib::output::left-justify() {
 center() {
   __lib::output::center "$@"
 }
+
 left() {
   __lib::output::left-justify "$@"
 }
@@ -255,7 +265,7 @@ screen.height() {
 }
 
 lib::output::is_terminal() {
-  lib::output::is_tty || lib::output::is_redirect || lib::output::is_pipe
+   lib::output::is_tty || lib::output::is_redirect || lib::output::is_pipe
 }
 
 lib::output::is_tty() {
