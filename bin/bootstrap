@@ -32,23 +32,16 @@ lib::bash::lib-install() {
       local sinceLast=$((${now} - ${LibBash__LastRebaseAt}))
 
       if [[ ${sinceLast} -gt ${LibBash__RebaseEvery} ]]; then
-        printf "⇨ ${bldblu}lib-bash may be outdated, updating...${txtgrn}\n" >&2
+        [[ -n $DEBUG ]] && printf "⇨ ${bldblu}lib-bash may be outdated, updating...${txtgrn}\n" >&2
 
         export LibBash__LastRebaseAt=${now}
         git pull --rebase 2>/dev/null 1>/dev/null
         code=$?
 
-        if [[ ${code} != 0 ]]; then
-          if [[ ${code} == 128 ]]; then
-            printf "${bldylw}Warning: unable to do ${bldblu}git pull --rebase${bldylw}\n" \
-                   "inside ${bldgrn}${LibBash__GitDestinationFolder}${clr}\n" >&2
-            printf "Do you have local changes there? Please check ${bldylw}../lib-bash${clr} " \
-                   "folder.\n" >&2
-          else
-            printf "${bldylw}Warning: unable to do ${bldblu}git pull --rebase${bldylw} " \
-                   "inside ${bldgrn}${LibBash__GitDestinationFolder}${clr}\n" >&2
-            printf "Exit code is ${code}\n" >&2
-          fi
+        if [[ ${code} -ne 0 ]]; then
+          printf "${bldylw}Warning: failed to ${bldgrn}git pull --rebase${bldylw} in ${bldred}${LibBash__GitDestinationFolder}${bldylw}...\n" >&2
+          printf "${bldylw}Do you have local changes there?\nPlease check ${bldred}${LibBash__GitDestinationFolder}${bldylw} folder for details.\n" >&2
+          printf "Exit code is ${bldred}${code}${clr}\n" >&2
           (( $_s_ )) && return ${code} || exit ${code}
         fi
       fi
