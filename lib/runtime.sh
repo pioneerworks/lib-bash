@@ -92,9 +92,8 @@ __lib::run::bundle::exec() {
 __lib::run::exec() {
   command="$*"
 
-  if [[ ${LibRun__Verbose} -eq ${True} ]] ; then
+  if [[ -n ${DEBUG} && ${LibRun__Verbose} -eq ${True} ]] ; then
     lib::run::inspect
-    hr
   fi
 
   [[ -z ${CI} ]] && w=$(( $(__lib::output::screen-width) - 10 ))
@@ -212,10 +211,19 @@ lib::run::inspect-variable() {
   local print_value=${2}
   local var_value=${!var_name}
   local value=""
-  (( ${var_value} )) && { value=" ✔︎ "; color=${bldgrn};  }
-  (( ${var_value} )) || { value=" ✘ "; color="${bldpur}"; }
 
-  printf "    ${color}%-30s = " ${var_name}
+  if [[ -n "${var_value}" && "${var_value}" == "${True}" ]] ; then
+    value=" ✔︎ "
+    color="${bldgrn}"
+  elif [[ -n "${var_value}" && "${var_value}" == "${False}" ]] ; then
+    value=" ✘ "
+    color="${bldred}"
+  else
+    print_value=true
+    color="${bldblu}"
+  fi
+
+  printf "    ${bldylw}%-40s = ${color}" ${var_name}
   if [[ -n ${print_value} ]]; then
     printf " ${var_value}"
   else
@@ -232,7 +240,7 @@ lib::run::inspect-variables() {
   local title=${1}; shift
   hl::subtle "${title}"
   for var in $@; do
-    lib::run::inspect-variable ${var}
+    lib::run::inspect-variable "${var}"
   done
   [[ ${#@} -gt 0 ]] && echo
 }
@@ -241,7 +249,7 @@ lib::run::print-variables() {
   local title=${1}; shift
   hl::subtle "${title}"
   for var in $@; do
-    lib::run::print-variable ${var}
+    lib::run::print-variable "${var}"
   done
   [[ ${#@} -gt 0 ]] && echo
 }

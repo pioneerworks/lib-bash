@@ -314,6 +314,10 @@ hl::subtle() {
   left "${bldcyn}${bakblk}${underlined}" "$@"
 }
 
+hl::desc() {
+  left "${txtblk}${bakylw}" "$@"
+}
+
 h::yellow() {
   center "${txtblk}${bakylw}" "$@"
 }
