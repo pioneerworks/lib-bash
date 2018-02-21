@@ -55,7 +55,8 @@ __lib::docker::next-version() {
 # Public Functions
 #===============================================================================
 lib::docker::build::container() {
-  __lib::docker::exec "docker build -m 3G -c 4 --pull -t homebase/homebase1-container . $*"
+  local tag=${HomebaseDockerRepo:-"local/container"}
+  __lib::docker::exec "docker build -m 3G -c 4 --pull -t ${tag} . $*"
 }
 
 # Docker Actions
