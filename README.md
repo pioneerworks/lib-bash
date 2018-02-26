@@ -28,33 +28,19 @@ Each library will have a set of private functions, typically named `__lib::util:
 In order to install this library into your environment, we recommend the following code in your primary "bash environment" file for a given project:
 
 ```bash
-#
-# Append this code in your primary shared library file, such as `bin/lib.bash`
-#
-export LibBash__BootstrapUrl="https://raw.githubusercontent.com/pioneerworks/lib-bash/master/bin/bootstrap"
-export LibBash__ScriptPath="bin/bootstrap"
+#!/usr/bin/env bash
+if [[ ! -L "bin/lib-bash" || ! -s "bin/bootstrap" ]]; then
+  TempFile="bin/bootstrap"
+  curl -fsSL https://raw.githubusercontent.com/pioneerworks/lib-bash/master/bin/bootstrap > ${TempFile}
+  source ${TempFile} lib-bash
+else
+  [[ -s "bin/bootstrap" ]] && source "bin/bootstrap" "lib-bash"
+  [[ -L "bin/lib-bash" ]]  && source "bin/lib-bash/Loader.bash"
+fi
 
-lib::bash::bootstrap() {
-  local __bootstrapPath=${1}
-  local __bootstrapUrl=${2}
-
-  if [[ -s ${__bootstrapPath} ]]; then
-    source ${__bootstrapPath}
-  else
-    if [[ -z $(which curl) && -n $(type lib::brew::install::package) ]] && lib::brew::install::package curl
-    if [[ -z $(which curl) ]] && {
-      printf "Can't find curl, please install it, eg. using brew...\n"
-      exit 2
-    }
-    curl -fsSL ${__bootstrapUrl} > ${__bootstrapPath}
-    source ${__bootstrapPath} lib-bash
-  fi
-}
-
-lib::bash::bootstrap ${LibBash__ScriptPath} ${LibBash__BootstrapUrl}
-# optional:
-# lib::bash::source "folder with local bash scripts", eg:
-# lib::bash::source "bin/lib/local"
+# optional to source a local library of all .sh files in a given folder
+# uncomment the below line:
+# lib::bash::source "bin/lib"
 ```
 
 The code above will automatically checkout this repo  `lib-bash` at the same level as the current project, but it will add a symlink from your projects `bin/lib-bash` folder to `../lib-bash/lib` where all the files are.
