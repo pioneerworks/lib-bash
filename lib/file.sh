@@ -25,3 +25,9 @@ __lib::file::size_bytes() {
   local file=$1
   printf $(($(wc -c < $file) + 0))
 }
+
+# Usage:
+#   (( $(lib::file::exists_and_newer_than "/tmp/file.txt" 30) )) && echo "Yes!"
+lib::file::exists_and_newer_than() {
+  [[ -n "$(find ${LibChef__IPCache} -mmin -${2} -print 2>/dev/null)" ]]
+}
