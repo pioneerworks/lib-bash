@@ -215,8 +215,8 @@ __lib::output::left-justify() {
   local color="${1}"
   shift
   local text="$*"
+  echo
   printf "${color}"
-
   ( lib::output::is_terminal ) && {
     local width=$(( $(__lib::output::screen-width) / 2 ))
     [[ ${width} -lt 60 ]] && width="60"
