@@ -311,7 +311,7 @@ box::red-in-yellow() {
 }
 
 box::red-in-red() {
-  __lib::output::box "${bldred}" "${txtred}${italic}" "$@"
+  __lib::output::box "${bldred}" "${txtred}" "$@"
 }
 
 box::green-in-magenta() {
@@ -475,8 +475,8 @@ info() {
 }
 
 error() {
-  text=$(printf "${clr}${bakred}${bldwht}  « ERROR »  ${clr}")
-  box::red-in-red "${text}" "$(error-text)$@"
+  header=$(printf "${clr}${bakred}${bldwht}       « ERROR »       ${clr}")
+  box::red-in-red "${header}" "$@"
   echo
 }
 

@@ -61,7 +61,7 @@ lib::color::enable() {
   fi
 }
 
-error-text()    { printf "${txtred}${italic}"; }
+error-text()    { printf "${txtred}"; }
 bold()          { ansi 1 "$@"; }
 italic()        { ansi 3 "$@"; }
 underline()     { ansi 4 "$@"; }
