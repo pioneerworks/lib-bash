@@ -44,6 +44,12 @@ lib::output::color::off() {
 }
 
 __lib::output::screen-width() {
+  [[ -n "${HomebaseCurrentScreenWidth}" && 
+  $(( $(millis) - ${HomebaseCurrentScreenMillis} )) -lt 20000 ]] && {
+    printf -- "${HomebaseCurrentScreenWidth}"
+    return
+  }
+
   if [[ ${HomebaseCurrentOS:-$(uname -s)} == 'Darwin' ]]; then
     w=$(stty -a | grep columns | awk '{print $6}')
   elif [[ ${HomebaseCurrentOS} == 'Linux' ]]; then
@@ -53,7 +59,11 @@ __lib::output::screen-width() {
   MIN_WIDTH=${MIN_WIDTH:-70}
   w=${w:-${MIN_WIDTH}}
   [[ "${w}" -lt "${MIN_WIDTH}" ]] && w=${MIN_WIDTH}
-  printf -- $(( $w - 2 ))
+
+  export HomebaseCurrentScreenWidth=${w}
+  export HomebaseCurrentScreenMillis=$(millis)
+
+  printf -- ${w}
 }
 
 __lib::output::screen-height() {
