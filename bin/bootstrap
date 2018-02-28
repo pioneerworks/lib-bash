@@ -26,6 +26,7 @@ lib::bash::lib-install() {
   [[ -z ${CI} && -d "${LibBash__GitDestinationFolder}" ]] && {
 
     cd ${LibBash__GitDestinationFolder}
+    [[ -s ".last-rebase" ]] && export LibBash__LastRebaseAt=(cat .last-rebase)
     if [[ ${LibBash__LastRebaseAt} -gt 0 ]]; then
 
       local now=$(epoch)
@@ -35,6 +36,8 @@ lib::bash::lib-install() {
         [[ -n $DEBUG ]] && printf "⇨ ${bldblu}lib-bash may be outdated, updating...${txtgrn}\n" >&2
 
         export LibBash__LastRebaseAt=${now}
+        echo ${LibBash__LastRebaseAt} > ".last-rebase"
+
         git pull --rebase 2>/dev/null 1>/dev/null
         code=$?
 
