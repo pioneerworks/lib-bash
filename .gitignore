@@ -54,3 +54,4 @@ build-iPhoneSimulator/
 .rvmrc
 bin/lib-bash
 bin/bootstrap
+.last-rebase
