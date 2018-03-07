@@ -32,7 +32,6 @@ lib::file::exists_and_newer_than() {
   [[ -n "$(find ${LibChef__IPCache} -mmin -${2} -print 2>/dev/null)" ]]
 }
 
-
 lib::file::install_with_backup() {
   local source=$1
   local dest=$2
@@ -46,6 +45,10 @@ lib::file::install_with_backup() {
       info: "${dest} is up to date"
       return 0
     else
+      (( ${LibFile__ForceOverwrite} )) || {
+        info "file ${dest} already exists, skipping (use -f to overwrite)"
+        return 0
+      }
       inf "making a backup of ${dest} (${dest}.bak)"
       cp "${dest}" "${dest}.bak" >/dev/null
       ok:

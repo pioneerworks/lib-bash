@@ -228,8 +228,8 @@ __lib::output::left-justify() {
   echo
   printf "${color}"
   ( lib::output::is_terminal ) && {
-    local width=$(( $(__lib::output::screen-width) / 2 ))
-    [[ ${width} -lt 60 ]] && width="60"
+    local width=$(( 2 * $(__lib::output::screen-width) / 3 ))
+    [[ ${width} -lt 70 ]] && width="70"
     __lib::output::repeat-char " " ${width}
     cursor.at.x 2
     printf "« ${text} »"
