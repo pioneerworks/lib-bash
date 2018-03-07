@@ -31,3 +31,26 @@ __lib::file::size_bytes() {
 lib::file::exists_and_newer_than() {
   [[ -n "$(find ${LibChef__IPCache} -mmin -${2} -print 2>/dev/null)" ]]
 }
+
+
+lib::file::install_with_backup() {
+  local source=$1
+  local dest=$2
+  if [[ ! -f ${source} ]]; then
+    error "file ${source} can not be found"
+    return -1
+  fi
+
+  if [[ -f "${dest}" ]]; then
+    if [[ -z $(diff ${dest} ${source} 2>/dev/null) ]]; then
+      info: "${dest} is up to date"
+      return 0
+    else
+      inf "making a backup of ${dest} (${dest}.bak)"
+      cp "${dest}" "${dest}.bak" >/dev/null
+      ok:
+    fi
+  fi
+
+  run "mkdir -p $(dirname ${dest}) && cp ${source} ${dest}"
+}

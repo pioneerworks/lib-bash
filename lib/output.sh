@@ -44,11 +44,11 @@ lib::output::color::off() {
 }
 
 __lib::output::screen-width() {
-  [[ -n "${HomebaseCurrentScreenWidth}" && 
-  $(( $(millis) - ${HomebaseCurrentScreenMillis} )) -lt 20000 ]] && {
+  if [[ -n "${HomebaseCurrentScreenWidth}" &&
+        $(( $(millis) - ${HomebaseCurrentScreenMillis} )) -lt 20000 ]]; then
     printf -- "${HomebaseCurrentScreenWidth}"
     return
-  }
+  fi
 
   if [[ ${HomebaseCurrentOS:-$(uname -s)} == 'Darwin' ]]; then
     w=$(stty -a | grep columns | awk '{print $6}')
@@ -324,6 +324,14 @@ box::magenta-in-green() {
 
 box::magenta-in-blue() {
   __lib::output::box "${bldblu}" "${bldpur}" "$@"
+}
+
+hl::blue() {
+  left "${bldwht}${bakblu}" "$@"
+}
+
+hl::green() {
+  left "${txtblk}${bakgrn}" "$@"
 }
 
 hl::yellow() {
