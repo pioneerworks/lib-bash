@@ -31,6 +31,7 @@ declare -a HomebaseBrewPackages=(
     direnv
     go
     htop
+    hub
     imagemagick
     jq
     memcached
