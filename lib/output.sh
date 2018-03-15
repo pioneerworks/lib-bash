@@ -63,7 +63,7 @@ __lib::output::screen-width() {
   export HomebaseCurrentScreenWidth=${w}
   export HomebaseCurrentScreenMillis=$(millis)
 
-  printf -- ${w}
+  printf -- "${w}"
 }
 
 __lib::output::screen-height() {
@@ -99,16 +99,18 @@ __lib::output::sep() {
 }
 
 __lib::output::repeat-char() {
-  local screen_width=$(( $(__lib::output::screen-width) ))
-
-  local char=${1:0:1}
-  local width=${2:-${screen_width}}
-
-  char=${char:-" "}
-  for i in {0..1000}; do
-    [[ $i -ge ${width} ]] && break
-    printf "$char"
+  local char="${1}"
+  local width=${2}
+  [[ -z "${width}" ]] && width=$(__lib::output::screen-width)
+  local line=""
+  for i in {1..300}; do
+    [[ $i -gt ${width} ]] && {
+      printf -- "${line}"
+      return
+    }
+    line="${line}${char}"
   done
+  printf -- "${line}"
 }
 
 # set background color to something before calling this
@@ -138,9 +140,19 @@ __lib::output::box-bottom() {
   printf "┘${clr}\n"
 }
 
+__lib::output::which-ruby() {
+  if [[ -x /usr/bin/ruby ]]; then
+    printf /usr/bin/ruby
+  elif [[ -x /usr/local/bin/ruby ]] ; then
+    printf /usr/local/bin/ruby
+  else
+    which ruby
+  fi
+}
+
 __lib::output::clean() {
   local text="$*"
-  printf -- "$text" | ruby -npe 'gsub(/\e\[[;m\d]+/, "")'
+  $(__lib::output::which-ruby) -e "input=\"${text}\"; " -e 'puts input.gsub(/\e\[[;m\d]+/, "")'
 }
 
 __lib::output::boxed-text() {
@@ -156,10 +168,10 @@ __lib::output::boxed-text() {
   }
 
   local clean_text=$(__lib::output::clean "${text}")
-  local width=$(__lib::output::screen-width)
-  local remaining_space_len=$(($width - ${#clean_text} - 3))
+  local width=$(( $(__lib::output::screen-width) - 2 ))
+  local remaining_space_len=$(($width - ${#clean_text} - 1))
   printf "${border_color}│ ${text_color}${text}"
-  [[ ${remaining_space_len} -gt 1 ]] && __lib::output::repeat-char " " ${remaining_space_len}
+  [[ ${remaining_space_len} -gt 0 ]] && __lib::output::repeat-char " " "${remaining_space_len}"
   __lib::output::cursor-left-by 1
   printf "${border_color}│${clr}\n"
 }
@@ -172,6 +184,7 @@ __lib::output::box() {
   shift
   local text_color=${1}
   shift
+  local line
 
   [[ lib::output::is_terminal ]] || {
     for line in "$@"; do
@@ -483,7 +496,7 @@ info() {
 }
 
 error() {
-  header=$(printf "${clr}${bakred}${bldwht}       « ERROR »       ${clr}")
+  header=$(printf -- "${bakred}${bldwht}   << ERROR >>   ${clr}")
   box::red-in-red "${header}" "$@"
   echo
 }
