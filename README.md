@@ -29,17 +29,22 @@ In order to install this library into your environment, we recommend the followi
 
 ```bash
 #!/usr/bin/env bash
-if [[ ! -L "bin/lib-bash" || ! -s "bin/bootstrap" ]]; then
-  TempFile="bin/bootstrap"
-  curl -fsSL https://raw.githubusercontent.com/pioneerworks/lib-bash/master/bin/bootstrap > ${TempFile}
-  source ${TempFile} lib-bash
+
+# lib-bash initialization:
+BootstrapScript="bin/bootstrap"
+if [[ -d "../lib-bash" && -s "../lib-bash/bin/bootstrap" ]]; then
+  cp ../lib-bash/bin/bootstrap "${BootstrapScript}"
 else
-  [[ -s "bin/bootstrap" ]] && source "bin/bootstrap" "lib-bash"
-  [[ -L "bin/lib-bash" ]]  && source "bin/lib-bash/Loader.bash"
+  if [[ ! -L "bin/lib-bash" || ! -s "bin/bootstrap" ]]; then
+    curl -fsSL https://raw.githubusercontent.com/pioneerworks/lib-bash/master/bin/bootstrap > "${BootstrapScript}"
+  fi
 fi
 
-# optional to source a local library of all .sh files in a given folder
-# uncomment the below line:
+[[ -s "bin/bootstrap" ]] && source "${BootstrapScript}" "lib-bash"
+[[ -L "bin/lib-bash" ]]  && source "bin/lib-bash/Loader.bash"
+
+# optional to source a local library of all .sh files in a given folder (non-recursively)
+# uncomment the following line
 # lib::bash::source "bin/lib"
 ```
 
