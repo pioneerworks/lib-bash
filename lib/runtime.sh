@@ -127,7 +127,7 @@ __lib::run::exec() {
 
     # Print stderr generated during command execution.
     [[ ${LibRun__ShowCommandOutput} -eq ${False} && -s ${run_stderr} ]] \
-      && stderr ${run_stderr}
+    && stderr ${run_stderr}
 
     if [[ ${LibRun__AskOnError} == ${True} ]] ; then
       lib::run::ask 'Ignore this error and continue?'
@@ -177,7 +177,7 @@ lib::run::with-min-duration() {
 
   if [[ ${result} -eq 0 && ${duration} -lt ${min_duration} ]]; then
     error "An operation ${bldylw}${command}${txtred} finished too quickly." \
-         "The threshold was set to ${bldylw}${min_duration}${txtred} seconds, but it only took ${bldylw}${duration}${txtred} secs"
+    "The threshold was set to ${bldylw}${min_duration}${txtred} seconds, but it only took ${bldylw}${duration}${txtred} secs"
     (( $_s_ )) && return 1 || exit 1
   elif [[ ${duration} -gt ${min_duration} ]]; then
     info "minimum duration operation ran in ${duration} seconds."
@@ -212,7 +212,7 @@ lib::run::inspect-variable() {
   local var_value=${!var_name}
   local value=""
 
-  local avail_len=$(($(screen.width) - 45))
+  local avail_len=$(($(screen.width) - 50))
 
   if [[ -n "${var_value}" && "${var_value}" == "${True}" ]] ; then
     value=" ✔︎ "
@@ -227,11 +227,10 @@ lib::run::inspect-variable() {
 
   printf "    ${bldylw}%-40s = ${color}" ${var_name}
   if [[ -n "${print_value}" ]]; then
-    printf "%-*.*s" ${avail_len} ${avail_len} "${var_value}"
+    printf "%-*.*s\n" ${avail_len} ${avail_len} "${var_value}"
   else
-    printf "%-*.*s" ${avail_len} ${avail_len} "${value}"
+    printf "%-*.*s\n" ${avail_len} ${avail_len} "${value}"
   fi
-  printf "${clr}\n"
 }
 
 lib::run::print-variable() {
@@ -240,33 +239,31 @@ lib::run::print-variable() {
 
 lib::run::inspect-variables() {
   local title=${1}; shift
-  hl::subtle "${title}"
+  hl::blue "${title}"
   for var in $@; do
     lib::run::inspect-variable "${var}"
   done
-  [[ ${#@} -gt 0 ]] && echo
 }
 
 lib::run::print-variables() {
   local title=${1}; shift
-  hl::subtle "${title}"
+  hl::yellow "${title}"
   for var in $@; do
     lib::run::print-variable "${var}"
   done
-  [[ ${#@} -gt 0 ]] && echo
 }
 
 lib::run::inspect() {
   if [[ ${#@} -eq 0 || $(array-contains-element config "$@") == "true" ]]; then
     lib::run::inspect-variables "CONFIGURATION" \
-      LibRun__AbortOnError__Default \
-      LibRun__AbortOnError \
-      LibRun__AskOnError__Default \
-      LibRun__AskOnError \
-      LibRun__ShowCommandOutput__Default \
-      LibRun__ShowCommandOutput \
-      LibRun__DryRun \
-      LibRun__Verbose
+    LibRun__AbortOnError__Default \
+    LibRun__AbortOnError \
+    LibRun__AskOnError__Default \
+    LibRun__AskOnError \
+    LibRun__ShowCommandOutput__Default \
+    LibRun__ShowCommandOutput \
+    LibRun__DryRun \
+    LibRun__Verbose
   fi
 
   if [[ ${#@} -eq 0 || $(array-contains-element "totals" "$@") == "true" ]]; then
@@ -279,9 +276,8 @@ lib::run::inspect() {
 
   if [[ ${#@} -eq 0 || $(array-contains-element "current" "$@") == "true" ]]; then
     lib::run::print-variables "LAST COMMAND" \
-      LibRun__LastExitCode
+    LibRun__LastExitCode
   fi
-  echo
 }
 
 lib::run() {

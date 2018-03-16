@@ -34,18 +34,18 @@ __lib::ver-to-i() {
 }
 
 lib::output::color::on() {
-  printf "${bldcyn}"
-  printf "${bldpur}" >&2
+  printf "${bldred}" >&2
+  printf "${bldblu}" >&1
 }
 
 lib::output::color::off() {
-  printf "${clr}"
   printf "${clr}" >&2
+  printf "${clr}" >&1
 }
 
 __lib::output::screen-width() {
   if [[ -n "${HomebaseCurrentScreenWidth}" &&
-        $(( $(millis) - ${HomebaseCurrentScreenMillis} )) -lt 20000 ]]; then
+  $(( $(millis) - ${HomebaseCurrentScreenMillis} )) -lt 20000 ]]; then
     printf -- "${HomebaseCurrentScreenWidth}"
     return
   fi
@@ -288,7 +288,7 @@ screen.height() {
 }
 
 lib::output::is_terminal() {
-   lib::output::is_tty || lib::output::is_redirect || lib::output::is_pipe
+  lib::output::is_tty || lib::output::is_redirect || lib::output::is_pipe
 }
 
 lib::output::is_tty() {
@@ -439,24 +439,24 @@ duration() {
   local millis=$1
   [[ -n $(which bc) ]] || return
   if [[ -n $millis && $millis -gt 0 ]] ; then
-    cursor.at.x 1
-    printf "${bldblu}%6.1fs " $(echo "scale=1;${millis}/1000" | bc)
+    cursor.at.x 3
+    printf "${bldblu}%4.1fs " $(echo "scale=1;${millis}/1000" | bc)
   fi
 }
 
 ok() {
   __lib::output::cursor-left-by 1000
-  printf "${bldgrn}✔︎${clr}"
+  printf " ${bldgrn}✔︎${clr}"
 }
 
 not_ok() {
   __lib::output::cursor-left-by 1000
-  printf "${bldred}✖${clr}"
+  printf " ${bldred}✖$clr}"
 }
 
 kind_of_ok() {
   __lib::output::cursor-left-by 1000
-  printf "${bldylw}⚠${clr}"
+  printf " ${bldylw}⚠${clr}"
 }
 
 ok:() {
