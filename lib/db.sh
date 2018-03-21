@@ -123,7 +123,7 @@ __lib::db::top::page() {
     psql -X -P pager ${db} -c "select now() - pg_last_xact_replay_timestamp() AS REPLICATION_DELAY_SECONDS" >> ${tof}
   fi
 
-  local query_width=$(( $(__lib::output::screen-width) - 73 ))
+  local query_width=$(( $(__lib::output::screen-width) - 78 ))
 
   printf "${bldcyn}[${dbtype}] ${bldpur}Above: Replication Status / Below: Active Queries:${clr}\n\n${bldylw}" >> ${tof}
 
