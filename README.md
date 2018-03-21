@@ -87,6 +87,23 @@ Please provide a properly named test for your new library, and a couple of test 
 See existing tests for examples.
 
 
+## Helpful Scripts
+
+### Changing OSX Underscan for Old Monitors
+
+If you are stuck working on a monitor that does not support switching digit input from TV to PC, NOR does OS-X show the "underscan" slider in the Display Preferences, you may be forced to change the underscan manually. The process is a bit tricky, but we have a helpful script to do that:
+
+```bash
+$ source lib/Loader.bash
+$ lib::osx::display::change-underscan 5
+```
+
+This will reduce underscan by 5% compared to the current value. The total value is 10000, and is stored in the file `/var/db/.com.apple.iokit.graphics`. The tricky part is determining which of the display entries map to your problem monitor. This is what the script helps with.
+
+Do not forget to restart after the change.
+
+Acknowledgements: the script is an automation of the method offered on [this blog post](http://ishan.co/external-monitor-underscan).
+
 ### Contributing
 
 Submit a pull request!
