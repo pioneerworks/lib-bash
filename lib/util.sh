@@ -89,3 +89,7 @@ lib::util::functions-matching() {
   local extra_command=${2:-"cat"}
   set | egrep "^${prefix}" | sed -E 's/.*:://g; s/[\(\)]//g;' | ${extra_command} | tr '\n ' ' '
 }
+
+lib::util::checksum::files() {
+  cat $* | shasum | awk '{print $1}'
+}

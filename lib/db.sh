@@ -3,6 +3,9 @@
 # Private Functions
 #===============================================================================
 
+export RAILS_SCHEMA_RB="db/schema.rb"
+export RAILS_SCHEMA_SQL="db/structure.sql"
+
 __lib::db::current_settings() {
   psql $* -X -q -c 'show all' | sort | awk '{ printf("%s=%s\n", $1, $3) }' | sed 's/[()\-]//g;/name=setting/d;/^[-+=]*$/d;/^[0-9]*=$/d'
 }
@@ -82,22 +85,18 @@ __lib::db::num_procs() {
   ps -ef | grep [p]ostgres | wc -l | awk '{print $1}'
 }
 
-__lib::db::schema-version() {
-  [[ ! -f db/schema.rb ]] && {
-    error "can not find db/schema.rb!"
-    return 1
-  }
-  lib::ci::cache::checksum::db
-}
-
 __lib::db::datetime() {
   date '+%Y%m%d-%H%M%S'
 }
 
 __lib::db::backup-filename() {
-  local dbname=${1}
-  # backup_file="${dir}/${checksum}.$(lib::util::arch).$(echo ${dir_to_backup} | sed 's/\//./g').tgz"
-  printf "$(__lib::db::schema-version).$(lib::util::arch).${dbname}.dump"
+  local dbname=${1:-"development"}
+  local checksum=$(lib::db::rails::schema::checksum)
+  if [[ -z ${checksum} ]]; then
+    error "Can not calculate DB checksum based on Rails DB structure"
+  else
+    printf "${checksum}.$(lib::util::arch).${dbname}.dump"
+  fi
 }
 
 __lib::db::is_valid() {
@@ -134,12 +133,34 @@ __lib::db::top::page() {
        from pg_stat_activity where state != 'idle' order by Duration desc" | \
       egrep -v 'select.*client_addr' | \
       sed 's/-/—/g;s/+/•/g;' 2>&1 >> ${tof}
-
 }
 
 #===============================================================================
 # Public Functions
 #===============================================================================
+
+lib::db::rails::schema::file() {
+  if [[ -f "${RAILS_SCHEMA_RB}" && -f "${RAILS_SCHEMA_SQL}" ]]; then
+    if [[ "${RAILS_SCHEMA_RB}" -nt "${RAILS_SCHEMA_SQL}" ]]; then
+      printf "${RAILS_SCHEMA_RB}"
+    else
+      printf "${RAILS_SCHEMA_SQL}"
+    fi
+  elif [[ -f "${RAILS_SCHEMA_RB}" ]]; then
+    printf "${RAILS_SCHEMA_RB}"
+  elif [[ -f "${RAILS_SCHEMA_SQL}" ]]; then
+    printf "${RAILS_SCHEMA_SQL}"
+  fi
+}
+
+lib::db::rails::schema::checksum() {
+  local schema=$(lib::db::rails::schema::file)
+  if [[ -z ${schema} ]]; then
+    error "can not find Rails schema in either ${RAILS_SCHEMA_RB} or ${RAILS_SCHEMA_SQL}"
+  else
+    lib::util::checksum::files "${schema}"
+  fi
+}
 
 lib::db::top() {
   local dbnames=$@
@@ -300,7 +321,6 @@ lib::db::restore() {
 
   return 0
 }
-
 
 hb.db.dump() {
   lib::db::dump "$@"
