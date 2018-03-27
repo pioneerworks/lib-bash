@@ -307,6 +307,10 @@ box::yellow-in-red() {
   __lib::output::box "${bldred}" "${bldylw}" "$@"
 }
 
+box::yellow-in-yellow() {
+  __lib::output::box "${bldylw}" "${txtylw}" "$@"
+}
+
 box::blue-in-yellow() {
   __lib::output::box "${bldylw}" "${bldblu}" "$@"
 }
@@ -446,17 +450,17 @@ duration() {
 
 ok() {
   __lib::output::cursor-left-by 1000
-  printf " ${bldgrn}✔︎${clr}"
+  printf " ${bldgrn}✔︎ ${clr}"
 }
 
 not_ok() {
   __lib::output::cursor-left-by 1000
-  printf " ${bldred}✖$clr}"
+  printf " ${bldred}☠ ${clr}"
 }
 
 kind_of_ok() {
   __lib::output::cursor-left-by 1000
-  printf " ${bldylw}⚠${clr}"
+  printf " ${bldylw}⚠ ${clr}"
 }
 
 ok:() {
@@ -479,15 +483,15 @@ puts() {
 }
 
 err() {
-  printf -- "    ${bldwht}${bakred}ERROR:${clr} ${bldred}$*${clr}"
+  printf -- "    ${bldwht}${bakred} ERROR: ${clr} ${bldred}$*${clr}" >&2
 }
 
 inf() {
-  printf -- "    ${txtblu}${clr}${txtblu}$*${clr}"
+  printf -- "    ${txtblu}${clr} ${txtblu}$*${clr}"
 }
 
 warn() {
-  printf -- "    ${txtblk}${bakylw} WARN:${clr} ${bldylw}$*${clr}"
+  printf -- "    ${txtblk}${bakylw} WARNING: ${clr} ${bldylw}$*${clr}" >&2
 }
 
 info() {
@@ -496,14 +500,13 @@ info() {
 }
 
 error() {
-  header=$(printf -- "${bakred}${bldwht}   << ERROR >>   ${clr}")
-  box::red-in-red "${header}" "$@"
-  echo
+  header=$(printf -- "${bakred}${bldwht}   << ERROR >>  ${clr}")
+  box::red-in-red "${header} : ${bldylw}$@" >&2
 }
 
 warning() {
-  warn $@
-  echo
+  header=$(printf -- "${txtblk}${bakylw}  << WARNING >> ${clr}")
+  box::yellow-in-yellow "${header} : ${bldpur}$@" >&2
 }
 
 info:() {
