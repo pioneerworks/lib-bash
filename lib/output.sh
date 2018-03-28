@@ -243,15 +243,12 @@ __lib::output::left-justify() {
   ( lib::output::is_terminal ) && {
     local width=$(( 2 * $(__lib::output::screen-width) / 3 ))
     [[ ${width} -lt 70 ]] && width="70"
-    __lib::output::repeat-char " " ${width}
-    cursor.at.x 2
-    printf "« ${text} »"
-    printf "${clr}\n\n"
+    printf -- "  %-${width}.${width}s${clr}\n\n" "« ${text} »"
   }
 
   ( lib::output::is_terminal ) || {
-    printf "  « ${text} »"
-    printf "  ${clr}\n\n"
+    printf -- "  « ${text} »"
+    printf -- "  ${clr}\n\n"
   }
 
 }
@@ -344,7 +341,7 @@ box::magenta-in-blue() {
 }
 
 hl::blue() {
-  left "${bldwht}${bakblu}" "$@"
+  left "${bldwht}${bakpur}" "$@"
 }
 
 hl::green() {
