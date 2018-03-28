@@ -13,7 +13,9 @@ lib::brew::upgrade() {
     return 1
   fi
 
-  run "brew upgrade --cleanup"
+  run "brew update --force"
+  run "brew upgrade"
+  run "brew cleanup -s"
 }
 
 lib::brew::setup() {

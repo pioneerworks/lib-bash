@@ -33,9 +33,20 @@ __lib::db::by_shortname() {
   printf "%s %s" "${dbtype}" "${db}"
 }
 
+lib::db::psql::args::homebase() {
+  printf -- "-U ${HomebasePostgresUsername} -h ${HomebasePostgresHostname} $*"
+}
+
 lib::db::psql-args() {
-  local db=$1
-  printf -- "-U ${HomebasePostgresUsername} -h ${HomebasePostgresHostname} ${db}"
+  lib::db::psql::args::homebase "$@"
+}
+
+lib::db::psql::args::default() {
+  printf -- "-U postgres -h localhost $*"
+}
+
+lib::db::psql::args::maint() {
+  printf -- "-U postgres -h localhost --maintenance-db=postgres $*"
 }
 
 __lib::db::args_for() {
@@ -66,7 +77,7 @@ __lib::db::wait_for_db() {
   local db=${1}
   inf 'waiting for the database to come up...'
   while true; do
-    out=$(psql -c "select count(*) from accounts" $(lib::db::psql-args ${db}) 2>&1)
+    out=$(psql -c "select count(*) from accounts" $(lib::db::psql::args::homebase ${db}) 2>&1)
     code=$?
     [[ ${code} == 0 ]] && break # can connect and all is good
     [[ ${code} == 1 ]] && break # db is there, but no database/table is found
@@ -100,7 +111,7 @@ __lib::db::backup-filename() {
 }
 
 __lib::db::is_valid() {
-  local dbname=${1}
+  local dbname="${1}"
   [[ -z ${dbname} ]] && return 1
 
   psql -U postgres -h localhost -c 'select count(*) from accounts' ${dbname} 1>/dev/null 2>/dev/null
@@ -134,6 +145,7 @@ __lib::db::top::page() {
       egrep -v 'select.*client_addr' | \
       sed 's/-/—/g;s/+/•/g;' 2>&1 >> ${tof}
 }
+
 
 #===============================================================================
 # Public Functions
@@ -285,26 +297,24 @@ lib::db::dump() {
 }
 
 lib::db::restore() {
-  local dbname=${1:-'homebase_development'}; shift
-  local filename=$1; [[ -n ${filename} ]] && shift
-  local psql_args="$*"
+  local dbname="$1"; shift
+  local filename="$1"; [[ -n ${filename} ]] && shift
 
-  [[ -z ${filename} ]] && filename=$(printf $(__lib::db::backup-filename ${dbname}))
+  [[ -z ${filename} ]] && filename=$(__lib::db::backup-filename ${dbname})
 
   [[ dbname =~ 'production' ]] && {
-    error 'This script is not meant for production'
-    return 1
-  }
+    error 'This script is not meant for production'; return 1; }
 
   [[ -s ${filename} ]] || {
-    error "can't find valid backup file in ${bldylw}${filename}"
-    return 2
-  }
+    error "can't find valid backup file in ${bldylw}${filename}"; return 2; }
 
-  [[ -z "${psql_args}" ]] && psql_args="-U postgres -h localhost"
+  psql_args=$(lib::db::psql::args::default)
+  maint_args=$(lib::db::psql::args::maint)
 
-  run "dropdb ${dbname} ${psql_args}"
-  run "createdb ${dbname} ${psql_args}"
+  run "dropdb ${maint_args} ${dbname} 2>/dev/null; true"
+
+  export LibRun__AbortOnError=${True}
+  run "createdb ${maint_args} ${dbname} ${psql_args}"
 
   [[ ${LibRun__Verbose} -eq ${True} ]] && {
     info "restoring from..: ${bldylw}${filename}"
@@ -318,8 +328,7 @@ lib::db::restore() {
     warning "pg_restore completed with exit code ${code}"
     return ${code}
   fi
-
-  return 0
+  return ${LibRun__LastExitCode}
 }
 
 hb.db.dump() {
