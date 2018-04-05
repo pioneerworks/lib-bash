@@ -176,8 +176,11 @@ lib::run::with-min-duration() {
   local duration=$((  ( $(millis) - ${started} ) / 1000 ))
 
   if [[ ${result} -eq 0 && ${duration} -lt ${min_duration} ]]; then
-    error "An operation ${bldylw}${command}${txtred} finished too quickly." \
-    "The threshold was set to ${bldylw}${min_duration}${txtred} seconds, but it only took ${bldylw}${duration}${txtred} secs"
+    local cmd="$(echo ${command} | sed 's/\"//g')"
+    error "An operation finished too quickly. The threshold was set to ${bldylw}${min_duration} sec." \
+        "The command took ${bldylw}${duration}${txtred} secs." \
+        "${bldylw}${cmd}${txtred}"
+
     (( $_s_ )) && return 1 || exit 1
   elif [[ ${duration} -gt ${min_duration} ]]; then
     info "minimum duration operation ran in ${duration} seconds."
