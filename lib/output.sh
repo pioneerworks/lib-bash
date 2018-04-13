@@ -479,6 +479,10 @@ puts() {
   printf "  ⇨ ${txtwht}$*${clr}"
 }
 
+success() {
+  printf -- "    ${bldwht}${bakgrn} COMPLETE SUCCESS! ${clr} ${bldgrn}$*${clr}" >&2
+}
+
 err() {
   printf -- "    ${bldwht}${bakred} ERROR: ${clr} ${bldred}$*${clr}" >&2
 }
