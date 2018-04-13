@@ -332,6 +332,11 @@ box::green-in-magenta() {
   __lib::output::box "${bldgrn}" "${bldpur}" "$@"
 }
 
+box::green-in-green() {
+  __lib::output::box "${bldgrn}" "${bldgrn}" "$@"
+}
+
+
 box::magenta-in-green() {
   __lib::output::box "${bldpur}" "${bldgrn}" "$@"
 }
@@ -479,8 +484,14 @@ puts() {
   printf "  ⇨ ${txtwht}$*${clr}"
 }
 
+okay() {
+  header=$(printf -- "${bakgrn}${bldwht}  << OKAY >>  ${clr}")
+  box::green-in-green "${header}   ${bldgrn}$@" >&2
+}
+
 success() {
-  printf -- "    ${bldwht}${bakgrn} COMPLETE SUCCESS! ${clr} ${bldgrn}$*${clr}" >&2
+  printf -- "    ${bldwht}${bakgrn} SUCCESS! ${clr} ${bldgrn}$*${clr}" >&2
+  echo
 }
 
 err() {
