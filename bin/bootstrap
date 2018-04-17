@@ -17,6 +17,11 @@ export True=1
 export False=0
 export LibRun__DryRun=${False}
 
+
+_info() {
+  printf "${bldblu} • $*${clr}\n"
+}
+
 quiet_cd() {
   dir=$1
   [[ -d ${dir} ]] && cd ${dir} >/dev/null
@@ -29,15 +34,17 @@ quiet_cd() {
 lib::bash::eval-remote-helpers() {
   # Load latest runner and output libs
   local temp=$(mktemp)
-  (( ${DEBUG} )) && printf "     ${bldblu}evaling output and runtime libs...${clr}\n"
+
+  (( ${DEBUG} )) && _info "downloading output and runtime libs..."
+
   for file in time output runtime run; do
     curl -fsSL https://raw.githubusercontent.com/pioneerworks/lib-bash/master/lib/${file}.sh >> ${temp}
   done
   source ${temp}
+  export LibRun__AbortOnError__Default=${True}
   rm -rf ${temp}
 }
 
-export LibRun__AbortOnError__Default=${True}
 
 lib::bash::epoch() {
   date +%s
@@ -52,7 +59,7 @@ lib::bash::clone() {
     }
     return 0
   else
-    (( ${DEBUG} )) && info "folder ${dir} already exists..."
+    (( ${DEBUG} )) && _info "folder ${dir} already exists..."
     return 1
   fi
 }
@@ -62,7 +69,7 @@ lib::bash::update() {
   local cwd=$(pwd)
   local now=$(lib::bash::epoch)
   if [[ -d "${dir}" ]]; then
-    info "updating ${bldblu}lib-bash${txtgrn} at ${bldylw}${now}."
+    _info "updating ${bldblu}lib-bash${txtgrn} at ${bldylw}${now}."
     quiet_cd ${dir}
     run "git fetch"
     local changes=$(git diff-index --name-only HEAD --)
@@ -71,12 +78,12 @@ lib::bash::update() {
         "I can stash the changes for you to continue, or abort."
       lib::run::ask "Would you prefer for me to stash changes and continue?"
     else
-      (( ${DEBUG} )) && info "no changes in the lib-bash folder"
+      (( ${DEBUG} )) && _info "no changes in the lib-bash folder"
     fi
 
     run "git reset --hard origin/master"
     run "echo ${now} > .last-rebase"
-    info "recorded the last rebase at $(lib::bash::epoch)"
+    _info "recorded the last rebase at $(lib::bash::epoch)"
     quiet_cd ${cwd}
     return 0
   else
@@ -100,20 +107,20 @@ lib::bash::rebase-if-stale() {
   local now=$(lib::bash::epoch)
   local secondsSinceLastRebase=$(( ${now} - ${lastRebaseAt} ))
 
-  (( ${DEBUG} )) && info "checking if lib-bash is stale..."
+  (( ${DEBUG} )) && _info "checking if lib-bash is stale..."
 
   if [[ ${lastRebaseAt} -gt 0 && ${secondsSinceLastRebase} -gt ${LibBash__RebaseEvery} ]]; then
-    info "note: your lib-bash folder is a bit out of date, auto-updating..."
+    _info "note: your lib-bash folder is a bit out of date, auto-updating..."
     lib::bash::update
   else
-    info "lib-bash is recent, its age is ${bldgrn}${secondsSinceLastRebase}sec" 
+    _info "lib-bash is recent, its age is ${bldgrn}${secondsSinceLastRebase}sec" 
   fi
 }
 
 lib::bash::symlink() {
   cd ${LibBash__Root}
   if [[ ! -L "${LibBash__InstallationFolder}" ]]; then
-    (( ${DEBUG} )) && info "symlink missing, creating ..."
+    (( ${DEBUG} )) && _info "symlink missing, creating ..."
     run "ln -nfs ../${LibBash__GitDestinationFolder}/lib/ ${LibBash__InstallationFolder}"
   fi
 }
@@ -123,10 +130,10 @@ lib::bash::gitignore() {
   [[ -s .gitignore ]] || return
   local ignored="bin/bootstrap"
   if [[ -z $(grep ${ignored} .gitignore 2>/dev/null) ]] ; then
-    (( ${DEBUG} )) && info "adding ${ignored} to .gitignore..."
+    (( ${DEBUG} )) && _info "adding ${ignored} to .gitignore..."
     run "echo bin/bootstrap >> .gitignore"
   else
-    (( ${DEBUG} )) && info "file .gitignore already has ${ignored}..."
+    (( ${DEBUG} )) && _info "file .gitignore already has ${ignored}..."
   fi
 }
 
