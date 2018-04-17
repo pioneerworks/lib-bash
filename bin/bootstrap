@@ -103,7 +103,7 @@ lib::bash::rebase-if-stale() {
   (( ${DEBUG} )) && info "checking if lib-bash is stale..."
 
   if [[ ${lastRebaseAt} -gt 0 && ${secondsSinceLastRebase} -gt ${LibBash__RebaseEvery} ]]; then
-    (( ${DEBUG} )) && info "yes, doing an update..."
+    info "note: your lib-bash folder is a bit out of date, auto-updating..."
     lib::bash::update
   else
     info "lib-bash is recent, its age is ${bldgrn}${secondsSinceLastRebase}sec" 
