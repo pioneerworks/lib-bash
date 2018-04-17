@@ -29,23 +29,37 @@ In order to install this library into your environment, we recommend the followi
 
 ```bash
 #!/usr/bin/env bash
+True=1
+False=0
 
-# lib-bash initialization:
-BootstrapScript="bin/bootstrap"
-if [[ -d "../lib-bash" && -s "../lib-bash/bin/bootstrap" ]]; then
-  cp ../lib-bash/bin/bootstrap "${BootstrapScript}"
-else
-  if [[ ! -L "bin/lib-bash" || ! -s "bin/bootstrap" ]]; then
-    curl -fsSL https://raw.githubusercontent.com/pioneerworks/lib-bash/master/bin/bootstrap > "${BootstrapScript}"
+ProjectRoot=$(pwd)
+ProjectBootstrap="bin/bootstrap"
+BootstrapParam="lib-bash"
+LibBashPath="${ProjectRoot}/../lib-bash"
+LibBashInstallerURL="https://raw.githubusercontent.com/pioneerworks/lib-bash/master/bin/install"
+LibBashInstallerFile="bootstrap"
+
+lib-bash-detect-downloader() {
+  if [[ -n $(which curl) ]]; then
+    export downloader="curl -fsSL "
+  elif [[ -n $(which wget) ]] ; then
+    export downloader="wget -q -O - "
+  else
+    printf "\nERROR: unable to determine what program to use in place of CURL or WGET...\n\n"
+    return 1
   fi
-fi
+}
 
-[[ -s "bin/bootstrap" ]] && source "${BootstrapScript}" "lib-bash"
-[[ -L "bin/lib-bash" ]]  && source "bin/lib-bash/Loader.bash"
+lib-bash-bootstrap() {
+  find . -mmin +300 -type f -name ${ProjectBootstrap} -exec rm {} \; > /dev/null
+  if [[ ! -s "${ProjectBootstrap}" ]]; then
+    ${downloader} ${LibBashInstallerURL} > ${ProjectBootstrap}
+    chmod 755 ${ProjectBootstrap} > /dev/null
+  fi
+  [[ -s "${ProjectBootstrap}" ]] && ./${ProjectBootstrap} >/dev/null
+}
 
-# optional to source a local library of all .sh files in a given folder (non-recursively)
-# uncomment the following line
-# lib::bash::source "bin/lib"
+lib-bash-detect-downloader && lib-bash-bootstrap
 ```
 
 The code above will automatically checkout this repo  `lib-bash` at the same level as the current project, but it will add a symlink from your projects `bin/lib-bash` folder to `../lib-bash/lib` where all the files are.

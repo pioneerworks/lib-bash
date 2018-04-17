@@ -107,24 +107,21 @@ lib::bash::rebase-if-stale() {
 lib::bash::symlink() {
   cd ${LibBash__Root}
   if [[ ! -L "${LibBash__InstallationFolder}" ]]; then
-    run "ln -nfs ${LibBash__GitDestinationFolder}/lib/ ${LibBash__InstallationFolder} 2>&1 | cat > /dev/null"
+    run "ln -nfs ../${LibBash__GitDestinationFolder}/lib/ ${LibBash__InstallationFolder}"
   fi
 }
 
 lib::bash::gitignore() {
   cd ${LibBash__Root}
-  
   [[ -s .gitignore ]] || return
 
   local ignored="bin/bootstrap"
-  $(grep ${ignored} .gitignore) || echo ${ignored} >> .gitignore
+  grep ${ignored} .gitignore || run "echo bin/bootstrap >> .gitignore"
 }
 
-lib::bash::install() {
-  lib::bash::eval-remote-helpers
-  lib::bash::clone || lib::bash::rebase-if-stale
-  lib::bash::symlink
-  lib::bash::gitignore
-}
+lib::bash::eval-remote-helpers
+lib::bash::clone || lib::bash::rebase-if-stale
+lib::bash::symlink
+lib::bash::gitignore
 
-lib::bash::install
+
