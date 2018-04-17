@@ -11,8 +11,6 @@ export LibBash__GitUrl="git@github.com:pioneerworks/lib-bash.git"
 export LibBash__RebaseEvery=3600 # seconds
 export LibBash__LastRebaseAt=${LibBash__LastRebaseAt:-1} # seconds
 
-export DEBUG=${DEBUG:-${False}}
-
 export True=1
 export False=0
 export LibRun__DryRun=${False}
