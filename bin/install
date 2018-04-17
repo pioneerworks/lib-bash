@@ -2,12 +2,18 @@
 
 set +e
 
+export LibBash__Root=$(pwd)
+
 export LibBash__LibFolder="lib-bash"
 export LibBash__InstallationFolder="bin/lib-bash"
 export LibBash__GitDestinationFolder="../lib-bash"
 export LibBash__GitUrl="git@github.com:pioneerworks/lib-bash.git"
 export LibBash__RebaseEvery=3600 # seconds
 export LibBash__LastRebaseAt=${LibBash__LastRebaseAt:-1} # seconds
+
+export True=1
+export False=0
+export LibRun__DryRun=${False}
 
 quiet_cd() {
   dir=$1
@@ -20,9 +26,12 @@ quiet_cd() {
 
 lib::bash::eval-remote-helpers() {
   # Load latest runner and output libs
-  for file in time output run; do
-    eval $(curl https://raw.githubusercontent.com/pioneerworks/lib-bash/master/lib/${file}.sh)
+  local temp=$(mktemp)
+  for file in time output runtime run; do
+    curl -fsSL https://raw.githubusercontent.com/pioneerworks/lib-bash/master/lib/${file}.sh > ${temp}
+    source ${temp}
   done
+  rm -rf ${temp}
 }
 
 export LibRun__AbortOnError__Default=${True}
@@ -88,13 +97,34 @@ lib::bash::last-rebase() {
 lib::bash::rebase-if-stale() {
   local lastRebaseAt=$(lib::bash::last-rebase)
   local now=$(lib::bash::epoch)
-  local secondsSinceLastRebase=$(( ${now} - ${LastRebaseAt} ))
+  local secondsSinceLastRebase=$(( ${now} - ${lastRebaseAt} ))
 
   if [[ ${lastRebaseAt} -gt 0 && ${secondsSinceLastRebase} -gt ${LibBash__RebaseEvery} ]]; then
     lib::bash::update
   fi
 }
 
-lib::bash::install() {
-  lib::bash::clone || lib::bash::rebase-if-stale
+lib::bash::symlink() {
+  cd ${LibBash__Root}
+  if [[ ! -L "${LibBash__InstallationFolder}" ]]; then
+    run "ln -nfs ${LibBash__GitDestinationFolder}/lib/ ${LibBash__InstallationFolder} 2>&1 | cat > /dev/null"
+  fi
 }
+
+lib::bash::gitignore() {
+  cd ${LibBash__Root}
+  
+  [[ -s .gitignore ]] || return
+
+  local ignored="bin/bootstrap"
+  $(grep ${ignored} .gitignore) || echo ${ignored} >> .gitignore
+}
+
+lib::bash::install() {
+  lib::bash::eval-remote-helpers
+  lib::bash::clone || lib::bash::rebase-if-stale
+  lib::bash::symlink
+  lib::bash::gitignore
+}
+
+lib::bash::install
