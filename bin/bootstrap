@@ -20,8 +20,7 @@ epoch() {
 lib::bash::lib-install() {
   local __home=$(pwd)
 
-  [[ -d "${LibBash__GitDestinationFolder}" ]] || \
-    git clone ${LibBash__GitUrl} ${LibBash__GitDestinationFolder} 2>&1 | cat > /dev/null
+  [[ -d "${LibBash__GitDestinationFolder}" ]] || git clone ${LibBash__GitUrl} ${LibBash__GitDestinationFolder} 2>&1 | cat > /dev/null
 
   [[ -z ${CI} && -d "${LibBash__GitDestinationFolder}" ]] && {
 
@@ -74,4 +73,3 @@ lib::bash::gitignore() {
 lib::bash::lib-install && \
   lib::bash::gitignore && \
   lib::bash::source ${LibBash__InstallationFolder}
-
