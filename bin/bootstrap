@@ -111,7 +111,7 @@ lib::bash::rebase-if-stale() {
     _info "note: your lib-bash folder is a bit out of date, auto-updating..."
     lib::bash::update
   else
-    _info "lib-bash is recent, its age is ${bldgrn}${secondsSinceLastRebase}sec" 
+    (( ${DEBUG} )) && _info "lib-bash is recent, its age is ${bldgrn}${secondsSinceLastRebase}sec" 
   fi
 }
 

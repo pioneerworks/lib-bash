@@ -166,11 +166,12 @@ lib::db::rails::schema::file() {
 }
 
 lib::db::rails::schema::checksum() {
-  local schema=$(lib::db::rails::schema::file)
-  if [[ -z ${schema} ]]; then
-    error "can not find Rails schema in either ${RAILS_SCHEMA_RB} or ${RAILS_SCHEMA_SQL}"
+  if [[ -d db/migrate ]]; then
+    find db/migrate -type f -ls | awk '{printf("%10d-%s\n",$7,$11)}' | sort | shasum | awk '{print $1}'
   else
-    lib::util::checksum::files "${schema}"
+    local schema=$(lib::db::rails::schema::file)
+    [[ -s ${schema} ]] || error "can not find Rails schema in either ${RAILS_SCHEMA_RB} or ${RAILS_SCHEMA_SQL}"
+    [[ -s ${schema} ]] && lib::util::checksum::files "${schema}"
   fi
 }
 
