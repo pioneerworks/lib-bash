@@ -17,7 +17,7 @@ export LibRun__DryRun=${False}
 
 
 _info() {
-  printf "${bldblu} • $*${clr}\n"
+  printf "${txtylw} • ${txtcya}$*${clr}\n"
 }
 
 quiet_cd() {
