@@ -242,7 +242,7 @@ lib::run::print-variable() {
 
 lib::run::inspect-variables() {
   local title=${1}; shift
-  hl::blue "${title}"
+  hl::subtle "${title}"
   for var in $@; do
     lib::run::inspect-variable "${var}"
   done
