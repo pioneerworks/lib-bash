@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+# Run me as:
+# curl -fsSL https://raw.githubusercontent.com/pioneerworks/lib-bash/master/bin/install | bash -x
+export True=1
+export False=0
+
+export ProjectRoot=$(pwd)
+
+export LibBash__BootstrapExec="bootstrap"
+export LibBash__BinPath="bin"
+export LibBash__RelPath="${ProjectRoot}/../lib-bash"
+export LibBash__BootstrapLibPath="${LibBash__RelPath}/${LibBash__BinPath}/${LibBash__BootstrapExec}"
+export LibBash__BootstrapLocalPath="${LibBash__BinPath}/${LibBash__BootstrapExec}"
+export LibBash__Branch="bin-install"
+export LibBash__GithubURL="https://raw.githubusercontent.com/pioneerworks/lib-bash"
+export LibBash__InstallerURL="${LibBash__GithubURL}/${LibBash__Branch}/bin/install?$RANDOM"
+export LibBash__BootstrapURL="${LibBash__GithubURL}/${LibBash__Branch}/bin/${LibBash__BootstrapExec}?$RANDOM"
+
+if [[ -n $(which curl) ]]; then
+  export LibBash__Downloader="curl -fsSL "
+else
+  export LibBash__Downloader="wget -q -O - "
+fi
+
+debug_log() {
+  [[ -n ${DEBUG} && ${USER} == "kig" ]] && printf "  ✅  ${bldgrn}${1}${clr}\n"
+}
+
+lib::bash::clean-old-bootstrap() {
+  debug_log "looking for old versions of ${bldylw}${LibBash__BootstrapExec}..."
+  find ${LibBash__BinPath} -mmin +1440 -type f -name ${LibBash__BootstrapExec} -exec rm {} \;
+}
+
+lib::bash::bootstrap() {
+  lib::bash::clean-old-bootstrap
+
+  if [[ ! -s "${LibBash__BootstrapLocalPath}" ]]; then
+    if [[ -s ${LibBash__BootstrapLibPath} ]]; then
+      debug_log "${LibBash__BootstrapLibPath} exists, copying to ${bldylw}${LibBash__BootstrapLocalPath}"
+      cp -pv ${LibBash__BootstrapLibPath} ${LibBash__BootstrapLocalPath}
+    else
+      debug_log "fetching lib-bash from ${undblu}${LibBash__BootstrapURL}"
+      ${LibBash__Downloader} ${LibBash__BootstrapURL} > ${LibBash__BootstrapLocalPath}
+    fi
+    chmod 755 ${LibBash__BootstrapLocalPath}
+  fi
+
+  if [[ -s "${LibBash__BootstrapLocalPath}" ]]; then
+    debug_log "running script ${bldylw}${LibBash__BootstrapLocalPath}"
+    source ${LibBash__BootstrapLocalPath}
+    lib::bash::bootstrap::main
+  fi
+}
+
+lib::bash::bootstrap

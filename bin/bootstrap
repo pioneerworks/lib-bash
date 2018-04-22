@@ -9,89 +9,79 @@ export LibBash__InstallationFolder="bin/lib-bash"
 export LibBash__GitDestinationFolder="../lib-bash"
 export LibBash__GitUrl="git@github.com:pioneerworks/lib-bash.git"
 export LibBash__RebaseEvery=86400 # seconds
-export LibBash__LastRebaseAt=${LibBash__LastRebaseAt:-1} # seconds
+export LibBash__LastRebaseAt=1
 
 export True=1
 export False=0
-export LibRun__DryRun=${False}
 
-
-_info() {
-  printf "${txtylw} • ${txtcya}$*${clr}\n"
+debug_log() {
+  [[ -n ${DEBUG} && ${USER} == "kig" ]] && printf "${txtylw} ✅  ${txtcya}$*${clr}\n"
+}
+error_log() {
+  printf "${txtylw} « ERROR » ${bldred}$*${clr}\n"
 }
 
 quiet_cd() {
   dir=$1
   [[ -d ${dir} ]] && cd ${dir} >/dev/null
   [[ -d ${dir} ]] || {
-    error "folder ${dir} does not exist."
+    error_log "folder ${dir} does not exist."
     exit 1
-  } 
+  }
 }
-
-lib::bash::eval-remote-helpers() {
-  # Load latest runner and output libs
-  local temp=$(mktemp)
-
-  (( ${DEBUG} )) && _info "downloading output and runtime libs..."
-
-  for file in time output runtime run; do
-    curl -fsSL https://raw.githubusercontent.com/pioneerworks/lib-bash/master/lib/${file}.sh >> ${temp}
-  done
-  source ${temp}
-  export LibRun__AbortOnError__Default=${True}
-  rm -rf ${temp}
-}
-
 
 lib::bash::epoch() {
   date +%s
 }
 
 lib::bash::clone() {
-  local dir="${1:-${LibBash__GitDestinationFolder}}"
+  local dir="${LibBash__GitDestinationFolder}"
   if [[ ! -d "${dir}" ]]; then
-    run "git clone ${LibBash__GitUrl} ${dir} 2>&1"
+    debug_log "cloning lib-bash repo to ${dir}..."
+    git clone ${LibBash__GitUrl} ${dir} 2>&1
     [[ ! -d  "${dir}" ]] && {
-      error "Unable to find lib-bash clone folder after checkout"; exit 1
+      error_log "Unable to find lib-bash clone folder after checkout"; exit 1
     }
-    return 0
   else
-    (( ${DEBUG} )) && _info "folder ${dir} already exists..."
-    return 1
+    lib::bash::rebase-if-stale
   fi
 }
 
 lib::bash::update() {
-  local dir="${1:-${LibBash__GitDestinationFolder}}"
+  local dir="${LibBash__GitDestinationFolder}"
   local cwd=$(pwd)
   local now=$(lib::bash::epoch)
+
   if [[ -d "${dir}" ]]; then
-    _info "updating ${bldblu}lib-bash${txtgrn} at ${bldylw}${now}."
     quiet_cd ${dir}
-    run "git fetch"
+
+    [[ $(basename $(pwd)) == 'lib-bash' ]] || {
+      error_log "expected to be in the ${LibBash__GitDestinationFolder} folder, but actually in $(pwd)"
+      exit 5
+    }
+
+    git fetch >/dev/null
+
     local changes=$(git diff-index --name-only HEAD --)
     if [[ -n "${changes}" ]]; then
-      warning "It looks like you have some local changes in ${bldred}${dir}.." \
-        "I can stash the changes for you to continue, or abort."
-      lib::run::ask "Would you prefer for me to stash changes and continue?"
-    else
-      (( ${DEBUG} )) && _info "no changes in the lib-bash folder"
+      error_log "It looks like you have some local changes in ${bldred}${dir}, aborting."
+      exit 4
     fi
 
-    run "git reset --hard origin/master"
-    run "echo ${now} > .last-rebase"
-    _info "recorded the last rebase at $(lib::bash::epoch)"
+
+    git reset --hard origin/master > /dev/null
+    echo ${now} > .last-rebase
+    debug_log "recorded the last rebase at $(lib::bash::epoch)"
     quiet_cd ${cwd}
     return 0
   else
-    error "directory ${dir} does not exist, aborting"
+    error_log "directory ${dir} does not exist, aborting"
     return 1
   fi
 }
 
 lib::bash::last-rebase() {
-  local dir="${1:-${LibBash__GitDestinationFolder}}"
+  local dir="${LibBash__GitDestinationFolder}}"
   if [[ -s "${dir}/.last-rebase" ]]; then
     printf "%d" $(cat ${dir}/.last-rebase)
   else
@@ -102,24 +92,24 @@ lib::bash::last-rebase() {
 lib::bash::rebase-if-stale() {
   local lastRebaseAt=$(lib::bash::last-rebase)
   [[ -z ${lastRebaseAt} ]] && lastRebaseAt=0
+
   local now=$(lib::bash::epoch)
   local secondsSinceLastRebase=$(( ${now} - ${lastRebaseAt} ))
-
-  (( ${DEBUG} )) && _info "checking if lib-bash is stale..."
+  local houseSinceLastRebase=$(( ${secondsSinceLastRebase} / 3600 ))
 
   if [[ ${lastRebaseAt} -gt 0 && ${secondsSinceLastRebase} -gt ${LibBash__RebaseEvery} ]]; then
-    _info "note: your lib-bash folder is a bit out of date, auto-updating..."
+    debug_log "updating ${bldblu}lib-bash${txtgrn}, which is ${houseSinceLastRebase} hours old."
     lib::bash::update
   else
-    (( ${DEBUG} )) && _info "lib-bash is recent, its age is ${bldgrn}${secondsSinceLastRebase}sec" 
+    debug_log "lib-bash is recent, its age is ${bldgrn}${houseSinceLastRebase}hrs..."
   fi
 }
 
 lib::bash::symlink() {
   cd ${LibBash__Root}
   if [[ ! -L "${LibBash__InstallationFolder}" ]]; then
-    (( ${DEBUG} )) && _info "symlink missing, creating ..."
-    run "ln -nfs ../${LibBash__GitDestinationFolder}/lib/ ${LibBash__InstallationFolder}"
+    debug_log "symlink ${LibBash__InstallationFolder} is missing, creating ..."
+    ln -nfs ../${LibBash__GitDestinationFolder}/lib/ ${LibBash__InstallationFolder} >/dev/null
   fi
 }
 
@@ -128,16 +118,15 @@ lib::bash::gitignore() {
   [[ -s .gitignore ]] || return
   local ignored="bin/bootstrap"
   if [[ -z $(grep ${ignored} .gitignore 2>/dev/null) ]] ; then
-    (( ${DEBUG} )) && _info "adding ${ignored} to .gitignore..."
-    run "echo bin/bootstrap >> .gitignore"
+    debug_log "adding ${ignored} to .gitignore..."
+    echo bin/bootstrap >> .gitignore
   else
-    (( ${DEBUG} )) && _info "file .gitignore already has ${ignored}..."
+    debug_log "file .gitignore already has ${ignored}..."
   fi
 }
 
-lib::bash::eval-remote-helpers
-lib::bash::clone || lib::bash::rebase-if-stale
-lib::bash::symlink
-lib::bash::gitignore
-
-
+lib::bash::bootstrap::main() {
+  lib::bash::clone
+  lib::bash::symlink
+  lib::bash::gitignore
+}
