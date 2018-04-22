@@ -10,7 +10,7 @@ export LibBash__Root=$(pwd)
 export LibBash__LibFolder="lib-bash"
 export LibBash__InstallationFolder="bin/lib-bash"
 export LibBash__GitDestinationFolder="../lib-bash"
-export LibBash__GitUrl="git@github.com:pioneerworks/lib-bash.git"
+export LibBash__GitUrl="https://github.com/pioneerworks/lib-bash"
 export LibBash__RebaseEvery=86400 # seconds
 export LibBash__LastRebaseAt=1
 
