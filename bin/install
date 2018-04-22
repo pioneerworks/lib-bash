@@ -7,15 +7,17 @@ export False=0
 
 export ProjectRoot=$(pwd)
 
+export LibBash__RandomQueryString="?q=${RANDOM}-$(date '+%s')"
+
 export LibBash__BootstrapExec="bootstrap"
 export LibBash__BinPath="bin"
 export LibBash__RelPath="${ProjectRoot}/../lib-bash"
 export LibBash__BootstrapLibPath="${LibBash__RelPath}/${LibBash__BinPath}/${LibBash__BootstrapExec}"
 export LibBash__BootstrapLocalPath="${LibBash__BinPath}/${LibBash__BootstrapExec}"
-export LibBash__Branch="bin-install"
+export LibBash__Branch="master"
 export LibBash__GithubURL="https://raw.githubusercontent.com/pioneerworks/lib-bash"
-export LibBash__InstallerURL="${LibBash__GithubURL}/${LibBash__Branch}/bin/install?$RANDOM"
-export LibBash__BootstrapURL="${LibBash__GithubURL}/${LibBash__Branch}/bin/${LibBash__BootstrapExec}?$RANDOM"
+export LibBash__InstallerURL="${LibBash__GithubURL}/${LibBash__Branch}/bin/install?${LibBash__RandomQueryString}"
+export LibBash__BootstrapURL="${LibBash__GithubURL}/${LibBash__Branch}/bin/${LibBash__BootstrapExec}?${LibBash__RandomQueryString}"
 
 if [[ -n $(which curl) ]]; then
   export LibBash__Downloader="curl -fsSL "
