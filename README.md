@@ -29,40 +29,14 @@ In order to install this library into your environment, we recommend the followi
 
 ```bash
 #!/usr/bin/env bash
-True=1
-False=0
 
-ProjectRoot=$(pwd)
-ProjectBootstrap="bin/bootstrap"
-BootstrapParam="lib-bash"
-LibBashPath="${ProjectRoot}/../lib-bash"
-LibBashInstallerURL="https://raw.githubusercontent.com/pioneerworks/lib-bash/master/bin/install"
-LibBashInstallerFile="bootstrap"
-
-lib-bash-detect-downloader() {
-  if [[ -n $(which curl) ]]; then
-    export downloader="curl -fsSL "
-  elif [[ -n $(which wget) ]] ; then
-    export downloader="wget -q -O - "
-  else
-    printf "\nERROR: unable to determine what program to use in place of CURL or WGET...\n\n"
-    return 1
-  fi
-}
-
-lib-bash-bootstrap() {
-  find . -mmin +300 -type f -name ${ProjectBootstrap} -exec rm {} \; > /dev/null
-  if [[ ! -s "${ProjectBootstrap}" ]]; then
-    ${downloader} ${LibBashInstallerURL} > ${ProjectBootstrap}
-    chmod 755 ${ProjectBootstrap} > /dev/null
-  fi
-  [[ -s "${ProjectBootstrap}" ]] && ./${ProjectBootstrap} >/dev/null
-}
-
-lib-bash-detect-downloader && lib-bash-bootstrap
+curl -fsSL https://raw.githubusercontent.com/pioneerworks/lib-bash/master/bin/install | /usr/bin/env bash
 ```
 
-The code above will automatically checkout this repo  `lib-bash` at the same level as the current project, but it will add a symlink from your projects `bin/lib-bash` folder to `../lib-bash/lib` where all the files are.
+The installer above will do the following:
+ * checkout lib-bash repo into `../lib-bash` folder
+ * it will add a symlink from withing project's `bin` folder to `../lib-bash/lib` where all the files are.m
+ * At this point, you should be able to source the library with `source bin/lib-bash/Loader.bash`
 
 ### Writing Scripts that use the Library Functions
 
@@ -73,15 +47,60 @@ Your scripts should almost always start with:
 # If you want to be able to tell if the script is run or sourced:
 ( [[ -n ${ZSH_EVAL_CONTEXT} && ${ZSH_EVAL_CONTEXT} =~ :file$ ]] || \
   [[ -n $BASH_VERSION && $0 != "$BASH_SOURCE" ]]) && _s_=1 || _s_=0
+
 # This exits if the file is being sourced instead of run.
-(( $_s_ )) && {
-  echo; printf "${txtred}This script should be run, not sourced.${clr}\n"
+(( $_s_ s)) && {
+  echo; printf "This script should be run, not sourced.${clr}\n"
   echo; exit 1
 }
 
-# Finally, this loads all the bash libraries:
-[[ -f lib/Loader.bash  ]] && source lib/Loader.bash
-[[ -f bin/lib-bash/Loader.bash  ]] && source bin/lib-bash/lib/Loader.bash
+# Finally, this loads all the bash libraries
+[[ -f bin/lib-bash/Loader.bash  ]] && source bin/lib-bash/Loader.bash
+```
+### Available functions
+
+These are too many to describe each in detail, but if you type:
+
+```bash
+$ lib::<tab><tab>
+```
+
+You will see all the functions. They are:
+
+```
+lib::bash-source                     lib::docker::actions::update
+lib::brew::already_installed         lib::docker::build::container
+lib::brew::cache_installed           lib::file::exists_and_newer_than
+lib::brew::install::cask             lib::file::install_with_backup
+lib::brew::install::package          lib::osx::display::change-underscan
+lib::brew::install::packages         lib::output::color::off
+lib::brew::reinstall::packages       lib::output::color::on
+lib::brew::relink                    lib::output::is_pipe
+lib::brew::setup                     lib::output::is_redirect
+lib::brew::uninstall::package        lib::output::is_terminal
+lib::brew::uninstall::packages       lib::output::is_tty
+lib::brew::upgrade                   lib::ruby::bundler-version
+lib::color::disable                  lib::ruby::gemfile-lock-version
+lib::color::enable                   lib::run
+lib::db::dump                        lib::run::ask
+lib::db::psql-args                   lib::run::inspect
+lib::db::psql::args::default         lib::run::inspect-variable
+lib::db::psql::args::homebase        lib::run::inspect-variables
+lib::db::psql::args::maint           lib::run::print-variable
+lib::db::rails::schema::checksum     lib::run::print-variables
+lib::db::rails::schema::file         lib::run::with-min-duration
+lib::db::restore                     lib::util::append-to-init-files
+lib::db::top                         lib::util::arch
+lib::docker::abort_if_down           lib::util::checksum::files
+lib::docker::actions::build          lib::util::functions-matching
+lib::docker::actions::clean          lib::util::i-to-ver
+lib::docker::actions::pull           lib::util::is-numeric
+lib::docker::actions::push           lib::util::lines-in-folder
+lib::docker::actions::setup          lib::util::shell-init-files
+lib::docker::actions::start          lib::util::shell-name
+lib::docker::actions::stop           lib::util::ver-to-i
+lib::docker::actions::tag            lib::util::whats-installed
+lib::docker::actions::up
 ```
 
 ### Naming Conventions

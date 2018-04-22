@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Run me as:
-# curl -fsSL https://raw.githubusercontent.com/pioneerworks/lib-bash/master/bin/install | bash -x
+# curl -fsSL https://raw.githubusercontent.com/pioneerworks/lib-bash/master/bin/install | bash
 export True=1
 export False=0
 
@@ -24,7 +24,7 @@ else
 fi
 
 debug_log() {
-  [[ -n ${DEBUG} && ${USER} == "kig" ]] && printf "  ✅  ${bldgrn}${1}${clr}\n"
+  [[ -n ${DEBUG} || ${USER} == "kig" ]] && printf "  ✅  ${bldgrn}${1}${clr}\n"
 }
 
 lib::bash::clean-old-bootstrap() {
@@ -36,6 +36,7 @@ lib::bash::bootstrap() {
   lib::bash::clean-old-bootstrap
 
   if [[ ! -s "${LibBash__BootstrapLocalPath}" ]]; then
+    mkdir -p $(dirname ${LibBash__BootstrapLocalPath}) > /dev/null
     if [[ -s ${LibBash__BootstrapLibPath} ]]; then
       debug_log "${LibBash__BootstrapLibPath} exists, copying to ${bldylw}${LibBash__BootstrapLocalPath}"
       cp -pv ${LibBash__BootstrapLibPath} ${LibBash__BootstrapLocalPath}

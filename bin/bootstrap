@@ -15,10 +15,11 @@ export True=1
 export False=0
 
 debug_log() {
-  [[ -n ${DEBUG} && ${USER} == "kig" ]] && printf "${txtylw} ✅  ${txtcya}$*${clr}\n"
+  [[ -n ${DEBUG} || ${USER} == "kig" ]] && printf "${txtylw} ✅  ${txtcya}$*${clr}\n"
 }
+
 error_log() {
-  printf "${txtylw} « ERROR » ${bldred}$*${clr}\n"
+  printf "${undred} « ERROR » ${clr}${bldred}$*${clr}\n"
 }
 
 quiet_cd() {
@@ -68,7 +69,6 @@ lib::bash::update() {
       exit 4
     fi
 
-
     git reset --hard origin/master > /dev/null
     echo ${now} > .last-rebase
     debug_log "recorded the last rebase at $(lib::bash::epoch)"
@@ -95,13 +95,13 @@ lib::bash::rebase-if-stale() {
 
   local now=$(lib::bash::epoch)
   local secondsSinceLastRebase=$(( ${now} - ${lastRebaseAt} ))
-  local houseSinceLastRebase=$(( ${secondsSinceLastRebase} / 3600 ))
+  local hoursSinceLastRebase=$(( ${secondsSinceLastRebase} / 3600 ))
 
   if [[ ${lastRebaseAt} -gt 0 && ${secondsSinceLastRebase} -gt ${LibBash__RebaseEvery} ]]; then
-    debug_log "updating ${bldblu}lib-bash${txtgrn}, which is ${houseSinceLastRebase} hours old."
+    debug_log "updating ${bldblu}lib-bash${txtgrn}, which is ${hoursSinceLastRebase} hours old."
     lib::bash::update
   else
-    debug_log "lib-bash is recent, its age is ${bldgrn}${houseSinceLastRebase}hrs..."
+    debug_log "lib-bash is recent, its age is ${bldgrn}${hoursSinceLastRebase}hrs..."
   fi
 }
 
