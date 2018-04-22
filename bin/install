@@ -26,7 +26,7 @@ else
 fi
 
 debug_log() {
-  [[ -n ${DEBUG} || ${USER} == "kig" ]] && printf " ✅  ${bldgrn}${1}${clr}\n"
+  [[ -n ${DEBUG} || ${USER} == "kig" ]] && printf " ✅  ${txtgrn}${1}${clr}\n"
 }
 
 lib::bash::clean-old-bootstrap() {
@@ -42,7 +42,7 @@ lib::bash::bootstrap() {
       debug_log "${LibBash__BootstrapLibPath} exists, copying to ${bldylw}${LibBash__BootstrapLocalPath}"
       cp -pv ${LibBash__BootstrapLibPath} ${LibBash__BootstrapLocalPath}
     else
-      debug_log "grabbing bootstrap ${undblu}${LibBash__BootstrapURL}"
+      debug_log "grabbing bootstrap script from:\n     → ${italic}${undblu}${LibBash__BootstrapURL}"
       ${LibBash__Downloader} ${LibBash__BootstrapURL} > ${LibBash__BootstrapLocalPath}
     fi
     chmod 755 ${LibBash__BootstrapLocalPath} > /dev/null

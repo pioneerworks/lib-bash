@@ -15,7 +15,7 @@ export True=1
 export False=0
 
 debug_log() {
-  [[ -n ${DEBUG} || ${USER} == "kig" ]] && printf "${txtylw} ✅  ${txtcya}$*${clr}\n"
+  [[ -n ${DEBUG} || ${USER} == "kig" ]] && printf " ✅  ${txtblu}$*${clr}\n"
 }
 
 error_log() {
