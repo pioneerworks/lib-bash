@@ -24,7 +24,7 @@ else
 fi
 
 debug_log() {
-  [[ -n ${DEBUG} || ${USER} == "kig" ]] && printf "  ✅  ${bldgrn}${1}${clr}\n"
+  [[ -n ${DEBUG} || ${USER} == "kig" ]] && printf " ✅  ${bldgrn}${1}${clr}\n"
 }
 
 lib::bash::clean-old-bootstrap() {
