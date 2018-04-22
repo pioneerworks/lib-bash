@@ -39,7 +39,7 @@ lib::bash::clone() {
   local dir="${LibBash__GitDestinationFolder}"
   if [[ ! -d "${dir}" ]]; then
     debug_log "cloning lib-bash repo to ${dir}..."
-    git clone ${LibBash__GitUrl} ${dir} 1>/dev/null
+    git clone ${LibBash__GitUrl} ${dir} --quiet
     [[ ! -d  "${dir}" ]] && {
       error_log "Unable to find lib-bash clone folder after checkout"; exit 1
     }
@@ -61,7 +61,7 @@ lib::bash::update() {
       exit 5
     }
 
-    git fetch >/dev/null
+    git fetch --quiet
 
     local changes=$(git diff-index --name-only HEAD --)
     if [[ -n "${changes}" ]]; then
@@ -69,7 +69,7 @@ lib::bash::update() {
       exit 4
     fi
 
-    git reset --hard origin/master > /dev/null
+    git reset --hard origin/master --quiet
     echo ${now} > .last-rebase
     debug_log "recorded the last rebase at $(lib::bash::epoch)"
     quiet_cd ${cwd}
