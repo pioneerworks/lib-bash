@@ -28,7 +28,6 @@ debug_log() {
 }
 
 lib::bash::clean-old-bootstrap() {
-  debug_log "looking for old versions of ${bldylw}${LibBash__BootstrapExec}..."
   find ${LibBash__BinPath} -mmin +1440 -type f -name ${LibBash__BootstrapExec} -exec rm {} \;
 }
 
@@ -41,10 +40,10 @@ lib::bash::bootstrap() {
       debug_log "${LibBash__BootstrapLibPath} exists, copying to ${bldylw}${LibBash__BootstrapLocalPath}"
       cp -pv ${LibBash__BootstrapLibPath} ${LibBash__BootstrapLocalPath}
     else
-      debug_log "fetching lib-bash from ${undblu}${LibBash__BootstrapURL}"
+      debug_log "grabbing bootstrap ${undblu}${LibBash__BootstrapURL}"
       ${LibBash__Downloader} ${LibBash__BootstrapURL} > ${LibBash__BootstrapLocalPath}
     fi
-    chmod 755 ${LibBash__BootstrapLocalPath}
+    chmod 755 ${LibBash__BootstrapLocalPath} > /dev/null
   fi
 
   if [[ -s "${LibBash__BootstrapLocalPath}" ]]; then

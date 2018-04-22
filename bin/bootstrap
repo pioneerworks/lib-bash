@@ -39,7 +39,7 @@ lib::bash::clone() {
   local dir="${LibBash__GitDestinationFolder}"
   if [[ ! -d "${dir}" ]]; then
     debug_log "cloning lib-bash repo to ${dir}..."
-    git clone ${LibBash__GitUrl} ${dir} 2>&1
+    git clone ${LibBash__GitUrl} ${dir} 1>/dev/null
     [[ ! -d  "${dir}" ]] && {
       error_log "Unable to find lib-bash clone folder after checkout"; exit 1
     }
