@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+( [[ -n ${ZSH_EVAL_CONTEXT} && ${ZSH_EVAL_CONTEXT} =~ :file$ ]] || \
+  [[ -n $BASH_VERSION && $0 != "$BASH_SOURCE" ]]) && _s_=1 || _s_=0
+
 set +e
 
 export LibBash__Root=$(pwd)
@@ -15,7 +18,9 @@ export True=1
 export False=0
 
 debug_log() {
-  [[ -n ${DEBUG} || ${USER} == "kig" ]] && printf " ✅  ${txtblu}$*${clr}\n"
+  if [[ -n ${DEBUG} || ${USER} == "kig" ]]; then
+    [[ -n ${LIB_BASH_QUIET} ]] || printf " ✅  ${txtblu}$*${clr}\n"
+  fi
 }
 
 error_log() {
@@ -130,3 +135,6 @@ lib::bash::bootstrap::main() {
   lib::bash::symlink
   lib::bash::gitignore
 }
+
+(( $_s_ )) || lib::bash::bootstrap::main
+
