@@ -97,7 +97,7 @@ __lib::run::exec() {
   fi
 
   [[ -z ${CI} ]] && w=$(( $(__lib::output::screen-width) - 10 ))
-  [[ -n ${CI} ]] && w=1000
+  [[ -n ${CI} ]] && w=10000
 
   printf "         ${clr}❯ ${bldylw}%s " "${command:0:${w}}"
   lib::output::color::on
