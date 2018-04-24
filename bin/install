@@ -39,7 +39,7 @@ fi
 
 debug_log() {
   if [[ -n ${DEBUG} || ${USER} == "kig" ]] ; then
-    [[ -n ${LIB_BASH_QUIET} ]] || printf " ${bldwht}${bakgrn} ✔ ${clr}${txtgrn}${1}${clr}\n"
+    [[ -n ${LIB_BASH_QUIET} ]] || printf " ${bldwht}${bakgrn} ✔ ${clr}  ${txtgrn}${1}${clr}\n"
   fi
 }
 
