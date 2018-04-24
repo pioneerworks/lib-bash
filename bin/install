@@ -1,7 +1,19 @@
 #!/usr/bin/env bash
-
+#
+# Author: Konstantin Gredeskoul, at Homebase,
+#         © 2018 All rights reserved, MIT License.
+#
+# LibBash Bootstrap Installer. It can be run straight off github and it downloads the
+# larger bootstrap script, which then does the rest of the setup.
+#
+# This library will install `./bin/bootstrap` script relative to the local folder,
+# as well clone this repo into `../lib-bash`, and then create a symlink from `bin/lib-bash` to
+# `../lib-bash/lib`. This way you can leverage all helpers defined in this project in your code.
+#
 # Run me as:
-# curl -fsSL https://raw.githubusercontent.com/pioneerworks/lib-bash/master/bin/install | bash
+#
+#     curl -fsSL https://raw.githubusercontent.com/pioneerworks/lib-bash/master/bin/install | bash
+#
 export True=1
 export False=0
 
@@ -27,7 +39,7 @@ fi
 
 debug_log() {
   if [[ -n ${DEBUG} || ${USER} == "kig" ]] ; then
-    [[ -n ${LIB_BASH_QUIET} ]] || printf " ✅  ${txtgrn}${1}${clr}\n"
+    [[ -n ${LIB_BASH_QUIET} ]] || printf " ${bldwht}${bakgrn} ✔ ${clr}${txtgrn}${1}${clr}\n"
   fi
 }
 
@@ -42,7 +54,7 @@ lib::bash::bootstrap() {
     mkdir -p $(dirname ${LibBash__BootstrapLocalPath}) > /dev/null
     if [[ -s ${LibBash__BootstrapLibPath} ]]; then
       debug_log "${LibBash__BootstrapLibPath} exists, copying to ${bldylw}${LibBash__BootstrapLocalPath}"
-      cp -pv ${LibBash__BootstrapLibPath} ${LibBash__BootstrapLocalPath}
+      cp -p ${LibBash__BootstrapLibPath} ${LibBash__BootstrapLocalPath} > /dev/null
     else
       debug_log "grabbing bootstrap script from:\n  → ${italic}${undblu}${LibBash__BootstrapURL}"
       ${LibBash__Downloader} ${LibBash__BootstrapURL} > ${LibBash__BootstrapLocalPath}

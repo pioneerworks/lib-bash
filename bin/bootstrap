@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
-
+#
+# Author: Konstantin Gredeskoul, at Homebase,
+#         © 2018 All rights reserved, MIT License.
+#
+#
+# This is the bootstrap script that can be either sourced in, or run.
+# If you source it in, you can run the primary BASH function:
+#
+#         $ source bin/bootstrap
+#         $ lib::bash::bootstrap::main
+#
+# Alernatively:
+#
+#         $ bin/bootstrap
+#
+#
 ( [[ -n ${ZSH_EVAL_CONTEXT} && ${ZSH_EVAL_CONTEXT} =~ :file$ ]] || \
   [[ -n $BASH_VERSION && $0 != "$BASH_SOURCE" ]]) && _s_=1 || _s_=0
 
