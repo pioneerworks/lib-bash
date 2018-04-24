@@ -5,6 +5,7 @@
 # This extracts a lib::gem::version from Gemfile.lock. If not found,
 # default (argument) is used. This helps prevent version mismatch
 # between the very few gem dependencies of the zeus subsystem, and Rails.
+export LibGem__GemListCache=/tmp/gem_list.txt
 
 lib::gem::version() {
   local gem=$1
@@ -23,8 +24,8 @@ lib::gem::version() {
 }
 
 lib::gem::load-list() {
-  if [[ ! -s "${GEM_LIST_FILE}" || -z $(find "${GEM_LIST_FILE}" -mmin -30) ]]; then
-    gem list > "${GEM_LIST_FILE}"
+  if [[ ! -s "${LibGem__GemListCache}" || -z $(find "${LibGem__GemListCache}" -mmin -30) ]]; then
+    gem list > "${LibGem__GemListCache}"
   fi
 }
 
@@ -35,9 +36,9 @@ lib::gem::is-installed() {
   lib::gem::load-list
 
   if [[ -z ${version} ]]; then
-    egrep "${gem} \(" "${GEM_LIST_FILE}"
+    egrep "${gem} \(" "${LibGem__GemListCache}"
   else
-    egrep "${gem} \(" "${GEM_LIST_FILE}" | grep "${version}"
+    egrep "${gem} \(" "${LibGem__GemListCache}" | grep "${version}"
   fi
 }
 
@@ -50,13 +51,13 @@ lib::gem::install() {
   gem_version=$(lib::gem::version ${gem_name} ${gem_version})
 
   if [[ -z $(lib::gem::is-installed ${gem_name} ${gem_version}) ]]; then
-    printf "(${txtylw}installing${clr}) ... ${bldred}"
+    printf "    (${txtylw}installing${clr}) ... ${bldred}"
     lib::gem::install ${gem_name} --version ${gem_version} 1>/dev/null
     result=$?
     printf ${clr}
-    [[ $result == 0 ]] && printf "${bldgrn} ✔ ${clr}\n"
-    [[ $result != 0 ]] && printf "${bldred} FAILED ${clr} with code ${result}\n"
-    [[ $result != 0 ]] && {
+    [[ ${result} == 0 ]] && printf "${bldgrn} ✔ ${clr}\n"
+    [[ ${result} != 0 ]] && printf "${bldred} FAILED ${clr} with code ${result}\n"
+    [[ ${result} != 0 ]] && {
       [[ ${_is_sourced} == "no" ]] && exit 1
       [[ ${_is_sourced} == "no" ]] || return
     }
