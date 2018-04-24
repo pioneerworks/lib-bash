@@ -485,17 +485,17 @@ puts() {
 }
 
 okay() {
-  header=$(printf -- "${bakgrn}${bldwht}  << OKAY >>  ${clr}")
+  header=$(printf -- "${bakgrn}${bldwht} « OKAY » ${clr}")
   box::green-in-green "${header}   ${bldgrn}$@" >&2
 }
 
 success() {
-  printf -- "    ${bldwht}${bakgrn} SUCCESS! ${clr} ${bldgrn}$*${clr}" >&2
+  printf -- "    ${bldwht}${bakgrn} « SUCCESS » ${clr} ${bldgrn}$*${clr}" >&2
   echo
 }
 
 err() {
-  printf -- "    ${bldwht}${bakred} ERROR: ${clr} ${bldred}$*${clr}" >&2
+  printf -- "    ${bldwht}${bakred} « ERROR » ${clr} ${bldred}$*${clr}" >&2
 }
 
 inf() {
@@ -503,7 +503,12 @@ inf() {
 }
 
 warn() {
-  printf -- "    ${txtblk}${bakylw} WARNING: ${clr} ${bldylw}$*${clr}" >&2
+  printf -- "    ${bldwht}${bakylw} « WARNING » ${clr} ${bldylw}$*${clr}" >&2
+}
+
+warning() {
+  header=$(printf -- "${bldwht}${bakylw} « WARNING » ${clr}")
+  box::yellow-in-yellow "${header} ${bldylw}$*" >&2
 }
 
 info() {
@@ -512,13 +517,8 @@ info() {
 }
 
 error() {
-  header=$(printf -- "${bakred}${bldwht}   << ERROR >>  ${clr}")
-  box::red-in-red "${header} : ${bldylw}$@" >&2
-}
-
-warning() {
-  header=$(printf -- "${txtblk}${bakylw}  << WARNING >> ${clr}")
-  box::yellow-in-yellow "${header} : ${bldpur}$@" >&2
+  header=$(printf -- "${bldwht}${bakred} « ERROR » ${clr}")
+  box::red-in-red "${header} ${bldylw}$@" >&2
 }
 
 info:() {

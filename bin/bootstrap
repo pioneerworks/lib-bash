@@ -120,7 +120,7 @@ lib::bash::hours-since-last-rebase() {
 lib::bash::rebase-if-stale() {
   local lastRebaseAt=$(lib::bash::last-rebase)
   [[ -z ${lastRebaseAt} ]] && lastRebaseAt=0
-  
+
   local hoursSinceLastRebase=$(lib::bash::hours-since-last-rebase ${lastRebaseAt})
 
   if [[ ${lastRebaseAt} -gt 0 && ${hoursSinceLastRebase} -gt ${LibBash__RebasePeriodHours} ]]; then
@@ -158,4 +158,3 @@ lib::bash::bootstrap::main() {
 }
 
 (( $_s_ )) || lib::bash::bootstrap::main
-
