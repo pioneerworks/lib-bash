@@ -26,7 +26,7 @@ export LibBash__LibFolder="lib-bash"
 export LibBash__InstallationFolder="bin/lib-bash"
 export LibBash__GitDestinationFolder="../lib-bash"
 export LibBash__GitUrl="https://github.com/pioneerworks/lib-bash"
-export LibBash__RebaseEvery=86400 # seconds
+export LibBash__RebasePeriodHours=24 # hours
 export LibBash__LastRebaseAt=1
 
 export True=1
@@ -39,7 +39,7 @@ debug_log() {
 }
 
 error_log() {
-  printf "${undred} « ERROR » ${clr}${bldred}$*${clr}\n"
+  printf "${bldwht}${bakred} « ERROR » ${clr}: ${bldred}$*${clr}\n"
 }
 
 quiet_cd() {
@@ -85,8 +85,10 @@ lib::bash::update() {
 
     local changes=$(git diff-index --name-only HEAD -- 2>/dev/null)
     if [[ -n "${changes}" ]]; then
-      error_log "It looks like you have some local changes in ${bldred}${dir}, aborting."
-      exit 4
+      echo
+      error_log "It looks like you have some local changes in ${bldylw}${dir}"
+      error_log "We must abort."
+      echo; exit 4
     fi
 
     git reset --hard origin/master --quiet >/dev/null
@@ -109,15 +111,19 @@ lib::bash::last-rebase() {
   fi
 }
 
+lib::bash::hours-since-last-rebase() {
+  local lastRebaseAt=$1
+  local now=$(lib::bash::epoch)
+  printf $(( ( ${now} - ${lastRebaseAt} ) / 3600 ))
+}
+
 lib::bash::rebase-if-stale() {
   local lastRebaseAt=$(lib::bash::last-rebase)
   [[ -z ${lastRebaseAt} ]] && lastRebaseAt=0
+  
+  local hoursSinceLastRebase=$(lib::bash::hours-since-last-rebase ${lastRebaseAt})
 
-  local now=$(lib::bash::epoch)
-  local secondsSinceLastRebase=$(( ${now} - ${lastRebaseAt} ))
-  local hoursSinceLastRebase=$(( ${secondsSinceLastRebase} / 3600 ))
-
-  if [[ ${lastRebaseAt} -gt 0 && ${secondsSinceLastRebase} -gt ${LibBash__RebaseEvery} ]]; then
+  if [[ ${lastRebaseAt} -gt 0 && ${hoursSinceLastRebase} -gt ${LibBash__RebasePeriodHours} ]]; then
     debug_log "updating ${bldblu}lib-bash${txtgrn}, which is ${hoursSinceLastRebase} hours old."
     lib::bash::update
   else
