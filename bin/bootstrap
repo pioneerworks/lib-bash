@@ -103,7 +103,7 @@ lib::bash::update() {
 }
 
 lib::bash::last-rebase() {
-  local dir="${LibBash__GitDestinationFolder}}"
+  local dir="${LibBash__GitDestinationFolder}"
   if [[ -s "${dir}/.last-rebase" ]]; then
     printf "%d" $(cat ${dir}/.last-rebase)
   else
