@@ -34,7 +34,7 @@ export False=0
 
 debug_log() {
   if [[ -n ${DEBUG} || ${USER} == "kig" ]]; then
-    [[ -n ${LIB_BASH_QUIET} ]] || printf " ${bldwht}${bakgrn} ✔ ${clr}  ${txtgrn}$*${clr}\n"
+    [[ -n ${LIB_BASH_QUIET} ]] || printf " ${bldwht}${bakgrn} ✔ ${clr} ${txtgrn}$*${clr}\n"
   fi
 }
 
