@@ -10,10 +10,18 @@
 # Returns "true" if the first argument is a member of the array
 # passed as the second argument:
 #
-#     declare -a array=("a string" "test2000")
+#
+#
+# Simplest case:
+#
+#     $ declare -a array=("a string" test2000 moo)
+#     $ lib::array::contains-element moo "${array[@]}" || echo "no luck!"
+#     $ lib::array::complain-unless-includes haha "${array[@]}" || echo "no luck!"
+
 #     if [[ $(array-contains-element "a string" "${array[@]}") == "true" ]]; then
 #       ...
 #     fi
+#
 #
 # @param: search string
 # @param: array to search as a string
@@ -33,16 +41,31 @@ array-contains-element() {
 lib::array::contains-element() {
   for e in "${@:2}"; do
     [[ "$e" == "$1" ]] && {
-      return 1
+      return 0
     }
   done
-  return 0
+  return 1
 }
 
 lib::array::complain-unless-includes() {
   lib::array::contains-element "$@" || {
-    error "Element ${bldwht}${1}${error_color}${bldylw} is not part of the array:" \
-          $(echo "${bldylw}${*:1}" | tr ' ' ', ')
+    error "Element ${bldwht}${1}${error_color}${bldylw} is not part of the array:"
+    local comma=
+    inf "Elements: "
+    printf "${bldgrn}"
+    while true; do
+      [[ -z $1 ]] && break
+      [[ -n "${comma}" ]] && printf ", "
+      [[ -z "${comma}" ]] && comma=true
+      if [[ "$1" =~ " " ]]; then
+        printf "'$1'"
+      else
+        printf "$1"
+      fi
+      shift
+    done
+    not_ok:
+    echo
     return 0
   }
   return 1
