@@ -224,7 +224,7 @@ lib::db::top() {
   trap "clear" EXIT
 
   local clear=0
-  local interval=0.5
+  local interval=${DB_TOP_REFRESH_RATE:-0.5}
   local num_dbs=${#connection_names[@]}
 
   local tof="$(mktemp -d "${TMPDIR:-/tmp/}.XXXXXXXXXXXX")/.db.top.$$"
