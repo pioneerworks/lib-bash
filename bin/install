@@ -31,17 +31,23 @@ export LibBash__GithubURL="https://raw.githubusercontent.com/pioneerworks/lib-ba
 export LibBash__InstallerURL="${LibBash__GithubURL}/${LibBash__Branch}/bin/install?${LibBash__RandomQueryString}"
 export LibBash__BootstrapURL="${LibBash__GithubURL}/${LibBash__Branch}/bin/${LibBash__BootstrapExec}?${LibBash__RandomQueryString}"
 
-if [[ -n $(which curl) ]]; then
-  export LibBash__Downloader="curl -fsSL "
-else
-  export LibBash__Downloader="wget -q -O - "
-fi
+unset LibBash__Downloader
+
+[[ -z ${LibBash__Downloader} && -n $(which curl) ]] && export LibBash__Downloader="curl -fsSL --connect-timeout 5 "
+[[ -z ${LibBash__Downloader} && -n $(which wget) ]] && export LibBash__Downloader="wget -q -O --connect-timeout=5 - "
+
+[[ -z "${LibBash__Downloader}" ]] && { 
+  printf "Error: can't figure out how to download things. No curl or wget found."
+  exit 1
+}
 
 debug_log() {
   if [[ -n ${DEBUG} || ${USER} == "kig" ]] ; then
     [[ -n ${LIB_BASH_QUIET} ]] || printf " ${bldwht}${bakgrn} ✔ ${clr} ${txtgrn}${1}${clr}\n"
   fi
 }
+
+debug_log "using downloader ${bldylw}${LibBash__Downloader}"
 
 lib::bash::clean-old-bootstrap() {
   find ${LibBash__BinPath} -mmin +1440 -type f -name ${LibBash__BootstrapExec} -print -exec rm {} \;
