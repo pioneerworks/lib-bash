@@ -36,7 +36,7 @@ unset LibBash__Downloader
 [[ -z ${LibBash__Downloader} && -n $(which curl) ]] && export LibBash__Downloader="curl -fsSL --connect-timeout 5 "
 [[ -z ${LibBash__Downloader} && -n $(which wget) ]] && export LibBash__Downloader="wget -q -O --connect-timeout=5 - "
 
-[[ -z "${LibBash__Downloader}" ]] && { 
+[[ -z "${LibBash__Downloader}" ]] && {
   printf "Error: can't figure out how to download things. No curl or wget found."
   exit 1
 }
@@ -65,6 +65,7 @@ lib::bash::bootstrap() {
       debug_log "grabbing bootstrap script from:\n  → ${italic}${undblu}${LibBash__BootstrapURL}"
       ${LibBash__Downloader} ${LibBash__BootstrapURL} > ${LibBash__BootstrapLocalPath}
     fi
+    touch ${LibBash__BootstrapLocalPath}
     chmod 755 ${LibBash__BootstrapLocalPath} > /dev/null
   fi
 
