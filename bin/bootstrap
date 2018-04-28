@@ -42,6 +42,10 @@ error_log() {
   printf "${bldwht}${bakred} « ERROR » ${clr}: ${bldred}$*${clr}\n"
 }
 
+info_log() {
+  printf "${bldylw} « info » ${clr}: ${bldblu}$*${clr}\n"
+}
+
 quiet_cd() {
   dir=$1
   [[ -d ${dir} ]] && cd ${dir} >/dev/null
@@ -86,9 +90,13 @@ lib::bash::update() {
     local changes=$(git diff-index --name-only HEAD -- 2>/dev/null)
     if [[ -n "${changes}" ]]; then
       echo
-      error_log "It looks like you have some local changes in ${bldylw}${dir}"
-      error_log "We must abort."
-      echo; exit 4
+      info_log "It looks like you have some local changes in ${bldgrn}${dir}."
+      info_log "I am going to create a patch and reset."
+
+      patch="../lib-bash.locally-modified.$(lib::bash::epoch).patch"
+      git reset .
+      git diff --patch > ${patch}
+      info_log "Patch created at ${bldgrn}${patch}."
     fi
 
     git reset --hard origin/master --quiet >/dev/null

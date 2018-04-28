@@ -44,7 +44,7 @@ debug_log() {
 }
 
 lib::bash::clean-old-bootstrap() {
-  find ${LibBash__BinPath} -mmin +1440 -type f -name ${LibBash__BootstrapExec} -exec rm {} \;
+  find ${LibBash__BinPath} -mmin +1440 -type f -name ${LibBash__BootstrapExec} -print -exec rm {} \;
 }
 
 lib::bash::bootstrap() {
@@ -64,8 +64,11 @@ lib::bash::bootstrap() {
 
   if [[ -s "${LibBash__BootstrapLocalPath}" ]]; then
     debug_log "running script ${bldylw}${LibBash__BootstrapLocalPath}"
-    source ${LibBash__BootstrapLocalPath}
-    lib::bash::bootstrap::main
+    if [[ -s ${LibBash__BootstrapLocalPath} ]]; then
+      source ${LibBash__BootstrapLocalPath}
+      # only run the function if it's defined
+      type lib::bash::bootstrap::main 2>/dev/null 1>/dev/null && lib::bash::bootstrap::main
+    fi
   fi
 }
 
