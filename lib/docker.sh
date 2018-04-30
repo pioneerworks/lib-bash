@@ -33,7 +33,8 @@ __lib::docker::exec() {
 }
 
 __lib::docker::last-version() {
-  local versions=$(docker images ${HomebaseDockerRepo} | egrep -v 'TAG|latest|none' | awk '{print $2}')
+  local repo=${1:-${HomebaseDockerRepo}}
+  local versions=$(docker images ${repo} | egrep -v 'TAG|latest|none' | awk '{print $2}')
 
   local max=0
   for v in ${versions}; do
@@ -45,7 +46,8 @@ __lib::docker::last-version() {
 }
 
 __lib::docker::next-version() {
-  local version=$(__lib::docker::last-version)
+  local repo=${1:-${HomebaseDockerRepo}}
+  local version=$(lib::docker::last-version ${repo})
   local vi=$(( $(lib::util::ver-to-i ${version}) + 1 ))
   printf $(lib::util::i-to-ver ${vi})
 }
@@ -54,6 +56,24 @@ __lib::docker::next-version() {
 #===============================================================================
 # Public Functions
 #===============================================================================
+lib::docker::last-version() {
+  local repo=$1
+  [[ -z ${repo} ]] && {
+    error "usage: lib::docker::last-version organization/reponame"
+    return 1
+  }
+  __lib::docker::last-version "$@"
+}
+
+lib::docker::next-version() {
+  local repo=$1
+  [[ -z ${repo} ]] && {
+    error "usage: lib::docker::next-version organization/reponame"
+    return 1
+  }
+  __lib::docker::next-version "$@"
+}
+
 lib::docker::build::container() {
   local tag=${HomebaseDockerRepo:-"local/container"}
   __lib::docker::exec "docker build -m 3G -c 4 --pull -t ${tag} . $*"
