@@ -511,6 +511,12 @@ warning() {
   box::yellow-in-yellow "${header} ${bldylw}$*" >&2
 }
 
+debug() {
+  if [[ -n ${DEBUG} ]]; then
+    info $@
+  fi
+}
+
 info() {
   inf $@
   echo
