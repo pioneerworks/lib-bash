@@ -49,22 +49,22 @@ lib::array::contains-element() {
 
 lib::array::complain-unless-includes() {
   lib::array::contains-element "$@" || {
-    error "Element ${bldwht}${1}${error_color}${bldylw} is not part of the array:"
-    local comma=
-    inf "Elements: "
-    printf "${bldgrn}"
+    element=$1; shift
+    local output=""
+    local comma=false
     while true; do
       [[ -z $1 ]] && break
-      [[ -n "${comma}" ]] && printf ", "
-      [[ -z "${comma}" ]] && comma=true
+      ${comma} && output="${output}, "
+      ${comma} || comma=true
       if [[ "$1" =~ " " ]]; then
-        printf "'$1'"
+        output="${output} '$1'"
       else
-        printf "$1"
+        output="${output} $1"
       fi
       shift
     done
-    not_ok:
+    output=$(echo $output | sed 's/  / /g')
+    error "Value ${bldwht}${element}${error_color}${bldylw} must be one of the following values: ${bldgrn}${output}"
     echo
     return 0
   }
