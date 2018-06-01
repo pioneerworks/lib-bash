@@ -96,7 +96,7 @@ __lib::run::exec() {
     lib::run::inspect
   fi
 
-  [[ -z ${CI} ]] && w=$(( $(__lib::output::screen-width) - 10 ))
+  [[ -z ${CI} ]] && w=$(( $(__lib::output::screen-width) - 15 ))
   [[ -n ${CI} ]] && w=10000
 
   printf "         ${clr}❯ ${bldylw}%s " "${command:0:${w}}"

@@ -513,7 +513,7 @@ warning() {
 
 debug() {
   if [[ -n ${DEBUG} ]]; then
-    info $@
+    info $@ 1>&2
   fi
 }
 
