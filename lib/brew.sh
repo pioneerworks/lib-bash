@@ -6,6 +6,12 @@
 #
 # Any modifications, © 2017 PioneerWorks, Inc. All rights reserved.
 #———————————————————————————————————————————————————————————————————————————————
+export LibBrew__PackageCacheList="/tmp/.lib_brew_packages.txt"
+export LibBrew__CaskCacheList="/tmp/.lib_brew_casks.txt"
+
+lib::brew::cache-reset() {
+  rm -f ${LibBrew__PackageCacheList} ${LibBrew__CaskCacheList}
+}
 
 lib::brew::upgrade() {
   if [[ -z "$(which brew)" ]]; then
@@ -45,22 +51,36 @@ lib::brew::relink() {
   run "brew link ${verbose} ${package} --overwrite"
 }
 
-lib::brew::cache_installed() {
-  if [[ -z "${installed_brew_packages[*]}" ]] ; then
-    set +e
-    export installed_brew_packages="$(brew list -1 | tr '\n' ' ')"
+lib::brew::package::list() {
+  lib::file::exists_and_newer_than "${LibBrew__PackageCacheList}" 30 || rm -f ${LibBrew__PackageCacheList}
+  if [[ -f ${LibBrew__PackageCacheList} ]]; then
+    cat ${LibBrew__PackageCacheList}
+  else
+    brew list -1 | tee -a "${LibBrew__PackageCacheList}"
   fi
 }
 
-lib::brew::already_installed() {
+lib::brew::package::is-installed() {
   local package=${1}
+  declare -a installed_packages=($(lib::brew::package::list))
+  array-contains-element ${package} ${installed_packages[@]}
+}
 
-  lib::brew::cache_installed
-  declare -a installed_packages=(${installed_brew_packages})
-  if [[ $(array-contains-element ${package} ${installed_packages[@]} ) == "true" ]]; then
-    printf "true"
+lib::brew::cask::list() {
+  lib::file::exists_and_newer_than "${LibBrew__CaskCacheList}" 30 || rm -f ${LibBrew__CaskCacheList}
+  if [[ -f ${LibBrew__CaskCacheList} ]]; then
+    cat ${LibBrew__CaskCacheList}
+  else
+    brew cask list -1 | tee -a "${LibBrew__CaskCacheList}"
   fi
 }
+
+lib::brew::cask::is-installed() {
+  local cask=${1}
+  declare -a installed_casks=($(lib::brew::cask::list))
+  array-contains-element ${cask} ${installed_casks[@]}
+}
+
 
 lib::brew::install::package() {
   local package=$1
@@ -71,38 +91,39 @@ lib::brew::install::package() {
   [[ -n ${opts_verbose} ]] && verbose="--verbose"
 
   inf "checking brew package ${bldylw}${package}"
-  if [[ $(lib::brew::already_installed ${package}) == "true" ]]; then
+  if [[ $(lib::brew::package::is-installed ${package}) == "true" ]]; then
     ok:
   else
     kind_of_ok:
     run "brew install ${package} ${force} ${verbose}"
     if [[ ${LibRun__LastExitCode} != 0 ]]; then
       not_ok:
-      warning "${package} failed to install, attempting to overwrite"
-      export LibRun__AbortOnError=${False}
+      info "${package} failed to install, attempting to reinstall..."
+      run "brew unlink ${package} ${force} ${verbose}; true"
+      run "brew uninstall ${package}  ${force} ${verbose}; true"
+      run "brew install ${package} ${force} ${verbose}"
       run "brew link ${package} --overwrite ${force} ${verbose}"
     fi
   fi
 }
 
 lib::brew::install::cask() {
-  local package=$1
+  local cask=$1
   local force=
   local verbose=
 
   [[ -n ${opts_force} ]] && force="--force"
   [[ -n ${opts_verbose} ]] && verbose="--verbose"
 
-  inf "verifying brew package ${bldylw}${package}"
-  if [[ -n $(brew cask list | grep ${package}) ]]; then
+  inf "verifying brew cask ${bldylw}${cask}"
+  if [[ -n $(ls -al /Applications/*.app | grep -i ${cask}) && -z ${opts_force} ]]; then
     ok:
-    run "brew update ${package} ${force} ${verbose}"
+  elif [[ $(lib::brew::cask::is-installed ${cask}) == "true" ]]; then
+    ok:
+    run "brew cask link ${cask} ${force} ${verbose}; true"
   else
     kind_of_ok:
-    run "brew cask install ${package} ${force} ${verbose}"
-    if [[ ${LibRun__LastExitCode} != 0 ]]; then
-      warning "${package} failed to install, attempting to overwrite"
-    fi
+    run "brew cask install ${cask} ${force} ${verbose}"
   fi
 }
 

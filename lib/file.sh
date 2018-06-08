@@ -29,7 +29,7 @@ __lib::file::size_bytes() {
 # Usage:
 #   (( $(lib::file::exists_and_newer_than "/tmp/file.txt" 30) )) && echo "Yes!"
 lib::file::exists_and_newer_than() {
-  [[ -n "$(find ${LibChef__IPCache} -mmin -${2} -print 2>/dev/null)" ]]
+  [[ -n "$(find ${1} -mmin -${2} -print 2>/dev/null)" ]]
 }
 
 lib::file::install_with_backup() {
