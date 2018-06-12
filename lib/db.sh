@@ -23,6 +23,10 @@ __lib::db::by_shortname() {
     export HB_DB_R2=${HB_DB_R2:-"-U awsuser -h $(aws::rds::hostname homebase-production-replica2) homebase"}
     dbtype=replica
     db=$HB_DB_R2
+  elif [[ $1 == "replica3" || $1 == "r3" ]]; then
+    export HB_DB_R3=${HB_DB_R3:-"-U awsuser -h $(aws::rds::hostname homebase-production-replica3) homebase"}
+    dbtype=replica
+    db=$HB_DB_R3
   elif [[ $1 == "clone" || $1 == "c" ]]; then
     export HB_DB_CL=${HB_DB_CL:-"-U awsuser -h $(aws::rds::hostname clone-standalone) homebase"}
     dbtype='clone'
@@ -138,14 +142,10 @@ __lib::db::top::page() {
   printf "${bldcyn}[${dbtype}] ${bldpur}Above: Replication Status / Below: Active Queries:${clr}\n\n${bldylw}" >> ${tof}
 
   psql -X -P pager ${db} -c \
-      "select pid,client_addr || ':' || client_port as Client,
-       substring(state for 10) as State, now() - query_start as Duration,
-       waiting as Wait, substring(query for ${query_width}) as Query
-       from pg_stat_activity where state != 'idle' order by Duration desc" | \
+      "select pid, client_addr || ':' || client_port as Client, substring(state for 10) as State, now() - query_start as Duration, waiting as Wait, substring(query for ${query_width}) as Query from pg_stat_activity where state != 'idle' order by Duration desc" | \
       egrep -v 'select.*client_addr' | \
       sed 's/-/—/g;s/+/•/g;' 2>&1 >> ${tof}
 }
-
 
 #===============================================================================
 # Public Functions
@@ -248,11 +248,11 @@ lib::db::top() {
         [[ ${index} -eq 3 ]] && percent_total_height=80
 
       elif [[ ${num_dbs} -eq 4 ]]; then
-        [[ ${index} -eq 2 ]] && percent_total_height=40
-        [[ ${index} -eq 3 ]] && percent_total_height=65
-        [[ ${index} -eq 4 ]] && percent_total_height=80
+        [[ ${index} -eq 2 ]] && percent_total_height=34
+        [[ ${index} -eq 3 ]] && percent_total_height=56
+        [[ ${index} -eq 4 ]] && percent_total_height=78
       fi
-
+      
       local vertical_shift=$(( ${percent_total_height} * ${screen_height} / 100 ))
 
       cursor.at.y ${vertical_shift} >> ${tof}
@@ -261,7 +261,7 @@ lib::db::top() {
       __lib::db::top::page "${tof}" "${__dbtype}" "${connections[${__dbtype}]}"
     done
     clear
-    h::yellow " « HOMEBASE DB-TOP V0.1.0 © 2018 PioneerWorks Inc. » "
+    h::yellow " « HOMEBASE DB-TOP V0.1.1 © 2018 PioneerWorks Inc. » "
     cat ${tof}
     cursor.at.y $(( $(__lib::output::screen-height) + 1 ))
     printf "${bldwht}Press Ctrl-C to quit.${clr}"
