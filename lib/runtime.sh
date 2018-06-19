@@ -176,7 +176,7 @@ lib::run::with-min-duration() {
   local duration=$((  ( $(millis) - ${started} ) / 1000 ))
 
   if [[ ${result} -eq 0 && ${duration} -lt ${min_duration} ]]; then
-    local cmd="$(echo ${command} | sed 's/\"//g')"
+    local cmd="$(echo ${command} | hbsed 's/\"//g')"
     error "An operation finished too quickly. The threshold was set to ${bldylw}${min_duration} sec." \
         "The command took ${bldylw}${duration}${txtred} secs." \
         "${bldylw}${cmd}${txtred}"

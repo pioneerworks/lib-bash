@@ -1,3 +1,4 @@
+#!/usr/bin/env bats
 load test_helper
 
 @test "lib::array::contains-element() when element exists" {

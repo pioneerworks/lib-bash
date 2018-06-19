@@ -71,7 +71,7 @@ lib::util::append-to-init-files() {
 }
 
 lib::util::whats-installed() {
-  declare -a hb_aliases=($(alias | grep -E 'hb\..*=' | sed 's/alias//g; s/=.*$//g'))
+  declare -a hb_aliases=($(alias | grep -E 'hb\..*=' | hbsed 's/alias//g; s/=.*$//g'))
   h2 "Installed homebase aliases:" ' ' "${hb_aliases[@]}"
 
   h2 "Installed DB Functions:"

@@ -1,3 +1,4 @@
+#!/usr/bin/env bats
 load test_helper
 
 @test "millis()" {
@@ -14,7 +15,7 @@ load test_helper
 
 @test "epoch()" {
   source lib/settings.sh
-  source lib/time.sh
+   source lib/time.sh
   local then=$(epoch)
   sleep 1
   local now=$(epoch)

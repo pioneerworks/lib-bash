@@ -15,7 +15,7 @@ lib::gem::version() {
   local version
 
   if [[ -f './Gemfile.lock' ]]; then
-    version=$(egrep "${gem} \(\d+\.\d+\.\d+\(\.\d+\)?\)" Gemfile.lock | awk '{print $2}' | sed 's/[()]//g')
+    version=$(egrep "${gem} \(\d+\.\d+\.\d+\(\.\d+\)?\)" Gemfile.lock | awk '{print $2}' | hbsed 's/[()]//g')
   else
     lib::gem::load-list
     version=$(gem list | egrep "${gem}" | awk '{print $2}' | sed -E 's/[(),]//g')

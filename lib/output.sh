@@ -53,7 +53,7 @@ __lib::output::screen-width() {
   if [[ ${HomebaseCurrentOS:-$(uname -s)} == 'Darwin' ]]; then
     w=$(stty -a | grep columns | awk '{print $6}')
   elif [[ ${HomebaseCurrentOS} == 'Linux' ]]; then
-    w=$(stty -a | grep columns | awk '{print $7}' | sed 's/;//g')
+    w=$(stty -a | grep columns | awk '{print $7}' | hbsed 's/;//g')
   fi
 
   MIN_WIDTH=${MIN_WIDTH:-80}
@@ -70,7 +70,7 @@ __lib::output::screen-height() {
   if [[ ${HomebaseCurrentOS:-$(uname -s)} == 'Darwin' ]]; then
     h=$(stty -a | grep rows | awk '{print $4}')
   elif [[ ${HomebaseCurrentOS} == 'Linux' ]]; then
-    h=$(stty -a | grep rows | awk '{print $5}' | sed 's/;//g')
+    h=$(stty -a | grep rows | awk '{print $5}' | hbsed 's/;//g')
   fi
 
   MIN_HEIGHT=${MIN_HEIGHT:-30}

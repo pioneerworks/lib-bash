@@ -63,7 +63,7 @@ lib::array::complain-unless-includes() {
       fi
       shift
     done
-    output=$(echo $output | sed 's/  / /g')
+    output=$(echo $output | hbsed 's/  / /g')
     error "Value ${bldwht}${element}${error_color}${bldylw} must be one of the following values: ${bldgrn}${output}"
     echo
     return 0

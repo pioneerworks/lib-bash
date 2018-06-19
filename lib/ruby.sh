@@ -16,7 +16,7 @@ lib::ruby::bundler-version() {
     error "Can not find Gemfile.lock"
     return 1
   fi
-  tail -1 Gemfile.lock | sed 's/ //g'
+  tail -1 Gemfile.lock | hbsed 's/ //g'
 }
 
 lib::ruby::version() {

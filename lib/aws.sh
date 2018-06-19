@@ -9,6 +9,6 @@ aws::rds::hostname() {
   [[ -z $(which jq) ]] && out=$(lib::brew::install::package jq 2>/dev/null 1>/dev/null)
   [[ -z $(which aws) ]] && out=$(lib::brew::install::package awscli 2>/dev/null 1>/dev/null)
 
-  [[ -n ${name} ]] && aws rds describe-db-instances | jq '.[][].Endpoint.Address' | sed 's/"//g'  | egrep "^${name}\."
-  [[ -z ${name} ]] && aws rds describe-db-instances | jq '.[][].Endpoint.Address' | sed 's/"//g'
+  [[ -n ${name} ]] && aws rds describe-db-instances | jq '.[][].Endpoint.Address' | hbsed 's/"//g'  | egrep "^${name}\."
+  [[ -z ${name} ]] && aws rds describe-db-instances | jq '.[][].Endpoint.Address' | hbsed 's/"//g'
 }
