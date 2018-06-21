@@ -247,9 +247,9 @@ lib::db::top() {
         [[ ${index} -eq 3 ]] && percent_total_height=80
 
       elif [[ ${num_dbs} -eq 4 ]]; then
-        [[ ${index} -eq 2 ]] && percent_total_height=34
-        [[ ${index} -eq 3 ]] && percent_total_height=56
-        [[ ${index} -eq 4 ]] && percent_total_height=78
+        [[ ${index} -eq 2 ]] && percent_total_height=40
+        [[ ${index} -eq 3 ]] && percent_total_height=60
+        [[ ${index} -eq 4 ]] && percent_total_height=80
       fi
       
       local vertical_shift=$(( ${percent_total_height} * ${screen_height} / 100 ))
