@@ -7,7 +7,7 @@ export RAILS_SCHEMA_RB="db/schema.rb"
 export RAILS_SCHEMA_SQL="db/structure.sql"
 
 __lib::db::current_settings() {
-  psql $* -X -q -c 'show all' | sort | awk '{ printf("%s=%s\n", $1, $3) }' | hbsed 's/[()\-]//g;/name=setting/d;/^[-+=]*$/d;/^[0-9]*=$/d'
+  psql $* -X -q -c 'show all' | sort | awk '{ printf("%s=%s\n", $1, $3) }' | sed -E 's/[()\-]//g;/name=setting/d;/^[-+=]*$/d;/^[0-9]*=$/d'
 }
 
 __lib::db::by_shortname() {
@@ -16,7 +16,7 @@ __lib::db::by_shortname() {
     export HB_DB_MS=${HB_DB_MS:-"-U awsuser -h $(aws::rds::hostname homebase-production) homebase"}
     db=$HB_DB_MS
   elif [[ $1 == "replica1" || $1 == "r1" ]]; then
-    export HB_DB_R1=${HB_DB_R1:-"-U awsuser -h $(aws::rds::hostname homebase-production-replica) homebase"}
+    export HB_DB_R1=${HB_DB_R1:-"-U awsuser -h $(aws::rds::hostname homebase-production-replica1) homebase"}
     dbtype=replica
     db=$HB_DB_R1
   elif [[ $1 == "replica2" || $1 == "r2" ]]; then
@@ -143,7 +143,7 @@ __lib::db::top::page() {
 
   psql -X -P pager ${db} -c \
       "select pid, client_addr || ':' || client_port as Client, substring(state for 10) as State, now() - query_start as Duration, waiting as Wait, substring(query for ${query_width}) as Query from pg_stat_activity where state != 'idle' order by Duration desc" | \
-      egrep -v 'select.*client_addr' | \ hbsed 's/-/—/g;s/+/•/g;' 2>&1 >> ${tof}
+      egrep -v 'select.*client_addr' 2>&1 >> ${tof}
 }
 
 #===============================================================================
