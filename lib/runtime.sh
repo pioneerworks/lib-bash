@@ -203,7 +203,7 @@ lib::run::ask() {
     info: "${txtgrn}Great, let's do this ☺ "
     return 0
   else
-    warning: "${txtylw}OK, no problem. Exiting.${clr}"
+    info: "${txtylw}OK, no problem. Cheers! 😊 ${clr}\n"
     (( $_s_ )) || exit 1
     (( $_s_ )) && return 1
   fi
