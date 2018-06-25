@@ -16,6 +16,7 @@ aws::rds::hostname() {
 # This this global to upload all assets there.
 export LibAws__DefaultUploadBucket=${LibAws__DefaultUploadBucket:-""}
 export LibAws__DefaultUploadFolder=${LibAws__DefaultUploadFolder:-""}
+export LibAws__DefaultRegion=${LibAws__DefaultRegion:-"us-west-2"}
 
 aws::s3::upload() {
   local pathname="$1"
@@ -51,4 +52,16 @@ aws::s3::upload() {
   local remote="s3://${LibAws__DefaultUploadBucket}/${LibAws__DefaultUploadFolder}/${year}/${remote_file}"
   
   run "aws s3 cp \"${pathname}\" \"${remote}\""
+
+  if [[ ${LibRun__LastExitCode} -eq 0 ]] ; then
+    local remoteUrl="https://s3-${LibAws__DefaultRegion}.amazonaws.com/${LibAws__DefaultUploadBucket}/${LibAws__DefaultUploadFolder}/${year}/${remote_file}"
+    echo
+    info "NOTE: You should now be able to access your resource at the following URL:"
+    hr
+    info "${bldylw}${remoteUrl}"
+    hr
+  else
+    error "AWS S3 upload failed with code ${LibRun__LastExitCode}"
+  fi
+  return ${LibRun__LastExitCode}
 }
