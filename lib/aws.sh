@@ -41,10 +41,10 @@ aws::s3::upload() {
   local remote_file="${file}"
 
   # remove the date from file, in case it's at the end or something
-  [[ "${remote_file}" =~ "${date}" ]] && remote_file=$(echo "${remote_file}" | sed "s/${date}//g")
+  [[ "${remote_file}" =~ "${date}" ]] && remote_file=$(echo "${remote_file}" | hbsed "s/[_\.-]?${date}[_\.-]//g")
 
   # prepend the date to the beginning of the file unless already in the file
-  [[ "${remote_file}" =~ "${date}" ]] || remote_file="${date}.${file}"
+  [[ "${remote_file}" =~ "${date}" ]] || remote_file="${date}.${remote_file}"
 
   # clean up spaces
   remote_file=$(echo "${remote_file}" | sed 's/ /-/g')
