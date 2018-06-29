@@ -21,9 +21,6 @@ export LibAws__DefaultRegion=${LibAws__DefaultRegion:-"us-west-2"}
 aws::s3::upload() {
   local pathname="$1"
 
-  local year=$(date +'%Y')
-  local date=$(date +'%Y-%m-%d')
-
   if [[ -z "${LibAws__DefaultUploadBucket}" || -z "${LibAws__DefaultUploadFolder}" ]]; then
     error "Required AWS S3 configuration is not defined." \
         "Please set variables: ${bldylw}LibAws__DefaultUploadFolder" \
@@ -37,8 +34,13 @@ aws::s3::upload() {
     return 1
   fi
 
-  local file=$(basename ${pathname})
+  local file=$(basename "${pathname}")
   local remote_file="${file}"
+  local year=$(lib::file::last-modified-year "${pathname}")
+  local date=$(lib::file::last-modified-date "${pathname}")
+
+  [[ -z ${year} ]] && year=$(date +'%Y')
+  [[ -z ${date} ]] && date=$(today)
 
   # remove the date from file, in case it's at the end or something
   [[ "${remote_file}" =~ "${date}" ]] && remote_file=$(echo "${remote_file}" | hbsed "s/[_\.-]?${date}[_\.-]//g")
@@ -47,10 +49,10 @@ aws::s3::upload() {
   [[ "${remote_file}" =~ "${date}" ]] || remote_file="${date}.${remote_file}"
 
   # clean up spaces
-  remote_file=$(echo "${remote_file}" | sed 's/ /-/g')
+  remote_file=$(echo "${remote_file}" | sed -E 's/ /-/g;s/--+/-/g' | tr '[A-Z]' '[a-z]')
 
   local remote="s3://${LibAws__DefaultUploadBucket}/${LibAws__DefaultUploadFolder}/${year}/${remote_file}"
-  
+
   run "aws s3 cp \"${pathname}\" \"${remote}\""
 
   if [[ ${LibRun__LastExitCode} -eq 0 ]] ; then

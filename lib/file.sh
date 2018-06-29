@@ -57,3 +57,10 @@ lib::file::install_with_backup() {
 
   run "mkdir -p $(dirname ${dest}) && cp ${source} ${dest}"
 }
+
+lib::file::last-modified-date() {
+  stat -f "%Sm" -t "%Y-%m-%d" "$1"
+}
+lib::file::last-modified-year() {
+  stat -f "%Sm" -t "%Y" "$1"
+}

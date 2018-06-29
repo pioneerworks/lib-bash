@@ -35,3 +35,7 @@ epoch() {
 millis() {
   __lib::run::millis
 }
+
+today() {
+  date +'%Y-%m-%d'
+}
