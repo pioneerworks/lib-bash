@@ -15,8 +15,16 @@ export HomebaseCurrentOS=$(uname -s)
 if [[ -f ".ruby-version" ]]; then
   export HomebaseRubyVersion=$(cat .ruby-version)
 else
-  export HomebaseRubyVersion="2.2.7"
+  export HomebaseRubyVersion="2.4.3"
 fi
+
+declare -a HomebaseBrewCasks=(
+  chromedriver
+  gitx
+  textmate
+  atom
+)
+export HomebaseBrewCasks
 
 declare -a HomebaseBrewPackages=(
     autoconf
@@ -26,13 +34,13 @@ declare -a HomebaseBrewPackages=(
     bash
     bash-completion
     coreutils
-    chromedriver
     curl
     direnv
     go
     htop
     hub
     imagemagick
+    jemalloc
     jq
     memcached
     openssl
