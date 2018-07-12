@@ -77,3 +77,29 @@ lib::osx::display::change-underscan() {
     info "eg: ${bldylw}vim ${file} +${line_pscn_value}"
   fi
 }
+
+# This function creates a tiny RAM disk on /var/ramdisk where the
+# decrypted settings will be stored until a reboot.
+lib::osx::ramdisk::mount() {
+  [[ $(uname -s) != "Darwin" ]] && {
+    error "This function only works on OSX"
+    return 1
+  }
+  if [[ -z $(df -h | grep ramdisk) ]]; then
+    diskutil erasevolume HFS+ 'ramdisk' `hdiutil attach -nomount ram://8192`
+  fi
+}
+
+
+# This function creates a tiny RAM disk on /var/ramdisk where the
+# decrypted settings will be stored until a reboot.
+lib::osx::ramdisk::unmount() {
+  [[ $(uname -s) != "Darwin" ]] && {
+    error "This function only works on OSX"
+    return 1
+  }
+  if [[ -n $(df -h | grep ramdisk) ]]; then
+    umount /Volumes/ramdisk
+  fi
+}
+
