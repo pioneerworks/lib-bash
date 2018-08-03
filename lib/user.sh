@@ -22,7 +22,22 @@ lib::user() {
   local user
   user=$(lib::user::finger::name)
   [[ -z "${user}" ]] && user="$(lib::user::gitconfig::name)"
-  [[ -z "${user}" ]] && user="$(lib::user::gitconfig::email )"
+  [[ -z "${user}" ]] && user="$(lib::user::gitconfig::email)"
   [[ -z "${user}" ]] && user="$(lib::user::username)"
   echo "${user}"
+}
+
+lib::user::my::ip() {
+  dig +short myip.opendns.com @resolver1.opendns.com
+}
+
+lib::user::my::reverse-ip() {
+  nslookup $(lib::user::my::ip) | grep 'name =' | hbsed 's/.*name = //g'
+}
+
+lib::user::host() {
+  local host=
+  host=$(lib::user::my::reverse-ip)
+  [[ -z ${host} ]] && host=$(lib::user::my::ip)
+  printf "${host}"
 }
