@@ -57,6 +57,7 @@ aws::s3::upload() {
 
   if [[ ${LibRun__LastExitCode} -eq 0 ]] ; then
     local remoteUrl="https://s3-${LibAws__DefaultRegion}.amazonaws.com/${LibAws__DefaultUploadBucket}/${LibAws__DefaultUploadFolder}/${year}/${remote_file}"
+    [[ -n "${LibAws__ObjectUrlFile}" ]] && echo ${remoteUrl} > "${LibAws__ObjectUrlFile}"
     echo
     info "NOTE: You should now be able to access your resource at the following URL:"
     hr
