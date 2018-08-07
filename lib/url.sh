@@ -1,23 +1,19 @@
 #!/usr/bin/env bash
 
 # Override these variables before using this library with your username/API key.
-export LibUrl__BitlyUsername
-export LibUrl__BitlyApiKey
+export BITLY_LOGIN
+export BITLY_API_KEY
 
-# If this variable is set, and no API key or username is defined,
-# then the lib::url::shorten function will display an error and not print any URL.
-# If it's not set, and API key or username is missing, then the function
-# simply skips over the shortening and prints out the original input URL.
-
-export LibUrl__BitlyValidation=${LibUrl__BitlyValidation:-"1"}
-
+# Description:
+#      If BITLY_LOGIN and BITLY_API_KEY are set, shortens the URL using Bitly.
+#      Otherwise, prints the original URL.
+#
 # Usage:
-#      source bin/Loader.bash
 #
-#      export LibUrl__BitlyUsername=awesome-user
-#      export LibUrl__BitlyApiKey=F_09097907778FFFDFDFKFGLASKKLJ
-#
+#      export BITLY_LOGIN=awesome-user
+#      export BITLY_API_KEY=F_09097907778FFFDFDFKFGLASKKLJ
 #      export long="https://s3-us-west-2.amazonaws.com/mybucket/long/very-long-url/2018-08-01.sweet.sweet.donut.right.about.now.html"
+#
 #      export short=$(lib::url::shorten ${long})
 #
 #      open ${short}  # opens in the browser
@@ -26,25 +22,11 @@ export LibUrl__BitlyValidation=${LibUrl__BitlyValidation:-"1"}
 lib::url::shorten() {
   local longUrl="$1"
 
-  if [[ "1" == "${LibUrl__BitlyValidation}" ]]; then
-    [[ -z "${LibUrl__BitlyUsername}" ]] && {
-      error "Please set your BitLy Username"
-      return 1
-    }
-
-    [[ -z "${LibUrl__BitlyApiKey}" ]] && {
-      error "Please set your BitLy Api Key, found in your settings on Bit.Ly"
-      return 2
-    }
-
+  if [[ -z "${BITLY_LOGIN}" || -z "${BITLY_API_KEY}" ]]; then
+    printf "${longUrl}\n"
   else
-    [[ -z "${LibUrl__BitlyUsername}" ||  -z "${LibUrl__BitlyApiKey}" ]] && {
-      printf "${longUrl}"
-      return 0
-    }
+    $(lib::url::downloader) "http://api.bit.ly/v3/shorten?login=${BITLY_LOGIN}&apiKey=${BITLY_API_KEY}&format=txt&longURL=${longUrl}"
   fi
-
-  $(lib::url::downloader) "http://api.bit.ly/v3/shorten?login=${LibUrl__BitlyUsername}&apiKey=${LibUrl__BitlyApiKey}&format=txt&longURL=${longUrl}"
 }
 
 
