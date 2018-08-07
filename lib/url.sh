@@ -26,7 +26,7 @@ export LibUrl__BitlyValidation=${LibUrl__BitlyValidation:-"1"}
 lib::url::shorten() {
   local longUrl="$1"
 
-  if [[ -n ${LibUrl__BitlyValidation} ]]; then
+  if [[ "1" == "${LibUrl__BitlyValidation}" ]]; then
     [[ -z "${LibUrl__BitlyUsername}" ]] && {
       error "Please set your BitLy Username"
       return 1
