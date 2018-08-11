@@ -24,16 +24,16 @@ export LibRun__AskOnError__Default=${False}
 # Maximum number of Retries that can be set via the 
 # LibRun__RetryCount variable before running the command.
 # After running the command, RetryCount is reset to RetryCountDefault.
-export LibRun__RetryCountDefault=
+export LibRun__RetryCount__Default=${LibRun__RetryCount__Default:-0}
+export LibRun__RetryCountMax=3
 
 __lib::run::initializer() {
   export LibRun__AbortOnError=${LibRun__AbortOnError__Default}
   export LibRun__AskOnError=${LibRun__AskOnError__Default}
   export LibRun__ShowCommandOutput=${LibRun__ShowCommandOutput__Default}
 
-  export LibRun__RetrySleep=1 # sleep between failed retries
-  export LibRun__RetryCountMax=3
-  export LibRun__RetryCount="${LibRun__RetryCountDefault}"
+  export LibRun__RetrySleep=${LibRun__RetrySleep:-"0.1"} # sleep between failed retries
+  export LibRun__RetryCount="${LibRun__RetryCount__Default}"
 
   declare -a LibRun__RetryExitCodes
   export LibRun__RetryExitCodes=()
@@ -191,13 +191,13 @@ __lib::run::exec() {
     duration ${duration}; echo
     commands_completed=$((${commands_completed} + 1))
   else
-    warn " ${txtblk}${bakylw}[ exit code = ${LibRun__LastExitCode} ]${clr}"
     not_ok
     duration ${duration}; echo
+    warn " ${txtblk}${bakylw}[ exit code = ${LibRun__LastExitCode} ]${clr}"
 
     # Print stderr generated during command execution.
     [[ ${LibRun__ShowCommandOutput} -eq ${False} && -s ${run_stderr} ]] \
-    && stderr ${run_stderr}
+      && echo && stderr ${run_stderr}
 
     if [[ ${LibRun__AskOnError} == ${True} ]] ; then
       lib::run::ask 'Ignore this error and continue?'
