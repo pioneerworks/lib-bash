@@ -124,15 +124,13 @@ __lib::run::eval() {
   local stderr=$1; shift
   local command="$*"
 
-  eval "${command}" 2>${stderr} 1>${stdout}
+  if [[ ${LibRun__ShowCommandOutput} -eq ${True} ]]; then
+    eval "${command}"
+  else
+    eval "${command}" 2>${stderr} 1>${stdout}
+  fi
+
   export LibRun__LastExitCode=$?
-  [[ ${LibRun__ShowCommandOutput} -eq ${True} ]] && {
-    printf "${txtblu}\n"
-    cat ${stdout}
-    printf "${bldred}\n"
-    cat ${stderr}
-    printf "${clr}\n"
-  }
 }
 #
 # This is the workhorse of the entire BASH library.
