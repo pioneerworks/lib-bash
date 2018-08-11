@@ -7,6 +7,9 @@
 # Any modifications, © 2017 PioneerWorks, Inc. All rights reserved.
 #——————————————————————————————————————————————————————————————————————————————
 
+# The following "global" variables define how the run framework executes
+# the commands, what it does if the commands fail, etc. 
+
 # This variable is set by each call to #run()
 export LibRun__LastExitCode=${False}
 
@@ -18,10 +21,22 @@ export LibRun__AbortOnError__Default=${False}
 export LibRun__ShowCommandOutput__Default=${False}
 export LibRun__AskOnError__Default=${False}
 
+# Maximum number of Retries that can be set via the 
+# LibRun__RetryCount variable before running the command.
+# After running the command, RetryCount is reset to RetryCountDefault.
+export LibRun__RetryCountDefault=
+
 __lib::run::initializer() {
   export LibRun__AbortOnError=${LibRun__AbortOnError__Default}
   export LibRun__AskOnError=${LibRun__AskOnError__Default}
   export LibRun__ShowCommandOutput=${LibRun__ShowCommandOutput__Default}
+
+  export LibRun__RetrySleep=1 # sleep between failed retries
+  export LibRun__RetryCountMax=3
+  export LibRun__RetryCount="${LibRun__RetryCountDefault}"
+
+  declare -a LibRun__RetryExitCodes
+  export LibRun__RetryExitCodes=()
 }
 
 export LibRun__DryRun=${False}
@@ -57,7 +72,11 @@ __lib::run() {
     info "${clr}[dry run] ${bldgrn}${cmd}"
     return 0
   else
+    export LibRun__LastExitCode=
     __lib::run::exec "$@"
+    
+
+    return ${LibRun__LastExitCode}
   fi
 }
 
@@ -81,6 +100,40 @@ __lib::run::bundle::exec() {
   fi
 }
 
+__lib::run::retry::enforce-max() {
+  [[ -n ${LibRun__RetryCount} && 
+        ${LibRun__RetryCount} -gt ${LibRun__RetryCountMax} ]] && 
+    export LibRun__RetryCount="${LibRun__RetryCountMax}"
+}
+
+__lib::run::retry::only-codes() {
+  export LibRun__RetryExitCodes=($@)
+} 
+
+__lib::run::should-retry-exit-code() {
+  local code=$1
+  if [[ -n ${LibRun__RetryExitCodes[*]} ]]; then
+    lib::array::contains-element "${code}" "${array[@]}"
+  else
+    return 0
+  fi 
+}
+
+__lib::run::eval() {
+  local stdout=$1; shift
+  local stderr=$1; shift
+  local command="$*"
+
+  eval "${command}" 2>${stderr} 1>${stdout}
+  export LibRun__LastExitCode=$?
+  [[ ${LibRun__ShowCommandOutput} -eq ${True} ]] && {
+    printf "${txtblu}\n"
+    cat ${stdout}
+    printf "${bldred}\n"
+    cat ${stderr}
+    printf "${clr}\n"
+  }
+}
 #
 # This is the workhorse of the entire BASH library.
 # It basically executes a statement, while processing it's output, error output,
@@ -103,16 +156,33 @@ __lib::run::exec() {
   lib::output::color::on
   set +e
 
+  local tries=0
+  
   start=$(millis)
 
-  if [[ ${LibRun__ShowCommandOutput} -eq ${True} ]] ; then
-    echo
-    eval "${command}"
-  else
-    eval "${command}" 2>${run_stderr} 1>${run_stdout}
-  fi
+  __lib::run::eval "${run_stdout}" "${run_stderr}" "${command}"
+  
 
-  export LibRun__LastExitCode=$?
+  while [[ 
+    -n ${LibRun__LastExitCode} && ${LibRun__LastExitCode} -ne 0 && 
+    -n ${LibRun__RetryCount}   && ${LibRun__RetryCount}   -gt 0 ]]; do
+    tries=$(( ${tries} + 1 ))
+
+    __lib::run::retry::enforce-max
+
+    export LibRun__RetryCount="$(( ${LibRun__RetryCount} - 1 ))"
+    [[ -n ${LibRun__RetrySleep} ]] && sleep ${LibRun__RetrySleep}
+ 
+    [[ ${tries} -eq 1 ]] && {
+      not_ok 
+      echo
+    }
+
+    info "last command failed with exit code ${bldred}${LibRun__LastExitCode} " \
+      "${txtblu} and ${bldylw}${LibRun__RetryCount} retries left."
+
+    __lib::run::eval "${run_stdout}" "${run_stderr}" "${command}"
+  done
 
   duration=$(( $(millis) - ${start}))
 
