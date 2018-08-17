@@ -4,6 +4,11 @@
 export BITLY_LOGIN
 export BITLY_API_KEY
 
+# These globals define flags used in fetching URLs.
+export LibUrl__CurlDownloaderFlags="-fsSL --connect-timeout 5 --retry-delay 10 --retry-max-time 300 --retry 15 "
+export LibUrl__WgetDownloaderFlags="-q --connect-timeout=5 --retry-connrefused --tries 15 -O - "
+
+
 # Description:
 #      If BITLY_LOGIN and BITLY_API_KEY are set, shortens the URL using Bitly.
 #      Otherwise, prints the original URL.
@@ -29,16 +34,13 @@ lib::url::shorten() {
   fi
 }
 
-
-
 lib::url::downloader() {
   local downloader=
 
   if [[ -z "${LibUrl__Downloader}" ]]; then
 
-    [[ -z "${downloader}" && -n $(which curl) ]] && downloader="$(which curl) -fsSL --connect-timeout 5 "
-    [[ -z "${downloader}" && -n $(which wget) ]] && downloader="$(which wget) -q -O --connect-timeout=5 - "
-
+    [[ -z "${downloader}" && -n $(which curl) ]] && downloader="$(which curl) ${LibUrl__CurlDownloaderFlags}"
+    [[ -z "${downloader}" && -n $(which wget) ]] && downloader="$(which wget) ${LibUrl__WgetDownloaderFlags}"
     [[ -z "${downloader}" ]] && {
       error "Neither Curl nor WGet appear in the \$PATH... HALP?"
       return 1
