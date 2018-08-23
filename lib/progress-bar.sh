@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 
+export abort_progress_bar=0
+
 __lib::progress::abort() {
   export abort_progress_bar=1
+}
+
+__lib::progress::reset() {
+  export abort_progress_bar=0
 }
 
 __lib::progress::draw-emtpy-bar() {
@@ -19,16 +25,28 @@ __lib::progress::draw-emtpy-bar() {
 #    lib::progress::bar 10 0.3 5
 #
 # Arguments:
-#    1st: width of the bar
-#    2nd: floating point number of seconds to sleep between steps
-#    3rd: number of loops to show.
+#    1st: number of bar cycles (defaults to 1)
+#    2nd: number of seconds it takes to complete the full progress bar
+#    3rd: optional full width of the bar (by default, full screen is used)
 #
 lib::progress::bar() {
-  local seconds=${1:-"9"}
-  local delay_seconds=${2:-"0.5"}
-  local loops=${3:-"1"}
+  __lib::progress::reset
+  __lib::progress::bar "$@"
+  code=$?
+  if [[ ${code} -ne 0 ]]; then
+    __lib::progress::reset
+    return 1
+  fi
+  return 0
+}
 
-  export abort_progress_bar=0
+__lib::progress::bar() {
+  local loops=${1:-"1"}
+  local full_cycle_seconds=${2:-"10"}
+  local width=$3
+  [[ -z ${width} ]] && width=$(( $(__lib::output::screen-width) - 5 ))
+
+  local delay_seconds=$( ruby -e "printf('%.3f', ${full_cycle_seconds}.0 / ${width}.0)" )
 
   trap "__lib::progress::abort" INT STOP
 
@@ -36,19 +54,23 @@ lib::progress::bar() {
   printf "${bldgrn}"
 
   for count in $(seq 1 ${loops}); do
-    __lib::progress::draw-emtpy-bar ${seconds}
+    __lib::progress::draw-emtpy-bar ${width}
     cursor.rewind 2
 
-    for j in $(seq 0 ${seconds}); do
+    for j in $(seq 0 ${width}); do
       sleep ${delay_seconds}
       printf "▉"
-      [[ ${abort_progress_bar} -eq 1 ]] && return
+      [[ ${abort_progress_bar} -eq 1 ]] && {
+        cursor.rewind
+        printf "${clr}"
+        return 1
+      }
     done
-
-    __lib::progress::draw-emtpy-bar ${seconds}
+    __lib::progress::draw-emtpy-bar ${width}
     cursor.rewind
   done
   printf "${clr}"
+  return 0
 }
 
 
