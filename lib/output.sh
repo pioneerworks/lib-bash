@@ -28,6 +28,10 @@ __lib::output::cursor-move-to-x() {
   __lib::output::cursor-right-by ${1:-0}
 }
 
+cursor.rewind() {
+  __lib::output::cursor-move-to-x 0
+}
+
 __lib::ver-to-i() {
   version=${1}
   echo ${version} | awk 'BEGIN{FS="."}{ printf "1%02d%03.3d%03.3d", $1, $2, $3}'
