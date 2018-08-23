@@ -28,6 +28,26 @@ __lib::run::millis() {
   fi
 }
 
+lib::time::epoch-to-iso() {
+  local epoch=$1
+  date -r ${epoch} -u "+%Y-%m-%dT%H:%M:%S%z" | sed 's/0000/00:00/g'
+}
+
+lib::time::epoch-to-local() {
+  local epoch=$1
+  [[ -z ${epoch} ]] && epoch=$(epoch)
+  date -r ${epoch} "+%m/%d/%Y, %r"
+}
+
+lib::time::epoch::minutes-ago() {
+  local mins=${1}
+
+  [[ -z ${mins} ]] && mins=1
+  local seconds=$(( ${mins} * 60 ))
+  local epoch=$(epoch)
+  echo $(( ${epoch} - ${seconds} ))
+}
+
 epoch() {
   date +%s
 }

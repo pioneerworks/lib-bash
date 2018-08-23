@@ -27,7 +27,6 @@
 # @param: array to search as a string
 # @output: prints "true" or "false"
 #
-set +e
 
 array-contains-element() {
   local e

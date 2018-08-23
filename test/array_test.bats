@@ -9,8 +9,8 @@ load test_helper
 
 @test "lib::array::contains-element() when element does not exists" {
   declare -a array=("a string" "test2000" "hello" "one")
-  run $(lib::array::contains-element boo "${array[@]}")
-  [ "$status" -eq 1 ]
+  run $(lib::array::contains-element "one" "${array[@]}")
+  [ $status -eq 0 ]
 }
 
 @test "array-contains-element() when element exists, using return value" {
@@ -32,5 +32,6 @@ load test_helper
 
 @test "array-contains-element when element does not exist using output" {
   declare -a array=("a string" "test2000" "hello" "one")
-  [[ $(array-contains-element 123 "${array[@]}") == "false" ]]
+  run $(array-contains-element 123 "${array[@]}") 
+  [[ $status -eq 1 ]]
 }

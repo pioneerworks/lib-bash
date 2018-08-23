@@ -29,7 +29,8 @@ __lib::output::cursor-move-to-x() {
 }
 
 cursor.rewind() {
-  __lib::output::cursor-move-to-x 0
+  local x=${1:-0}
+  __lib::output::cursor-move-to-x ${x}
 }
 
 __lib::ver-to-i() {
