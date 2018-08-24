@@ -49,8 +49,7 @@ lib::output::color::off() {
 }
 
 __lib::output::screen-width() {
-  if [[ -n "${HomebaseCurrentScreenWidth}" &&
-  $(( $(millis) - ${HomebaseCurrentScreenMillis} )) -lt 20000 ]]; then
+  if [[ -n "${HomebaseCurrentScreenWidth}" && $(( $(millis) - ${HomebaseCurrentScreenMillis} )) -lt 20000 ]]; then
     printf -- "${HomebaseCurrentScreenWidth}"
     return
   fi
@@ -175,7 +174,8 @@ __lib::output::boxed-text() {
   local clean_text=$(__lib::output::clean "${text}")
   local width=$(( $(__lib::output::screen-width) - 2 ))
   local remaining_space_len=$(($width - ${#clean_text} - 1))
-  printf "${border_color}│ ${text_color}${text}"
+  printf "${border_color}│ ${text_color}"
+  printf -- "${text}"
   [[ ${remaining_space_len} -gt 0 ]] && __lib::output::repeat-char " " "${remaining_space_len}"
   __lib::output::cursor-left-by 1
   printf "${border_color}│${clr}\n"
@@ -224,7 +224,7 @@ __lib::output::center() {
   local text="$*"
 
   local clean_text=$(__lib::output::clean "${text}")
-  local width=$(__lib::output::screen-width)
+  local width=$(( $(__lib::output::screen-width) - 2 ))
   local remaining_space_len=$(( 1 + ($width - ${#clean_text}) / 2 ))
 
   local offset=0
@@ -233,7 +233,7 @@ __lib::output::center() {
   printf "${color}"
   cursor.at.x -1
   __lib::output::repeat-char " " ${remaining_space_len}
-  printf "${text}"
+  printf "%s" "${text}"
   __lib::output::repeat-char " " $(( ${remaining_space_len} + ${offset} ))
   printf "${clr}\n"
   cursor.at.x -1

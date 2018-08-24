@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
 export abort_progress_bar=0
-export LibProgress__BarColor=${bldgrn}
-export LibProgress__BarChar="▉"
+
+export LibProgress__BarColor__Default="${txtgrn}"
+export LibProgress__BarColor="${LibProgress__BarColor__Default}"
+
+export LibProgress__BarChar__Default="▉"
+export LibProgress__BarChar="${LibProgress__BarChar__Default}"
 
 __lib::progress::abort() {
   export abort_progress_bar=1
@@ -52,20 +56,23 @@ __lib::progress::bar() {
 
   trap "__lib::progress::abort" INT STOP
 
+  [[ -z "${LibProgress__BarColor}" ]] && LibProgress__BarColor=${LibProgress__BarColor__Default}
+  [[ -z "${LibProgress__BarChar}"  ]] && LibProgress__BarChar=${LibProgress__BarChar__Default}
 
   cursor.rewind
+
   printf "${LibProgress__BarColor}"
 
   for count in $(seq 1 ${loops}); do
     __lib::progress::draw-emtpy-bar ${width}
     cursor.rewind 2
-
     for j in $(seq 0 ${width}); do
       sleep ${delay_seconds}
       printf "${LibProgress__BarChar}"
       [[ ${abort_progress_bar} -eq 1 ]] && {
         cursor.rewind
         printf "${clr}"
+        __lib::progress::draw-emtpy-bar ${width}
         return 1
       }
     done
