@@ -18,3 +18,11 @@ source "test/test_helper.bash"
 for file in $(ls -1 test/*_test.*); do
   bats -p "${file}"
 done
+
+export os=$(uname -s)
+
+if [[ ${os} == "Darwin" ]]; then
+  for file in $(ls -1 test/osx/*_test.*); do
+    bats -p "${file}"
+  done
+fi
