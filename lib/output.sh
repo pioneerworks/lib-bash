@@ -504,7 +504,7 @@ err() {
 }
 
 inf() {
-  printf -- "    ${txtblu}${clr} ${txtblu}$*${clr}"
+  printf -- "    ${txtblu}${clr}${txtblu}$*${clr}"
 }
 
 warn() {
