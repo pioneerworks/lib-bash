@@ -19,10 +19,10 @@ for file in $(ls -1 test/*_test.*); do
   bats -p "${file}"
 done
 
-export os=$(uname -s)
+export os=$(uname -s | tr [A-Z] [a-z])
 
-if [[ ${os} == "Darwin" ]]; then
-  for file in $(ls -1 test/osx/*_test.*); do
+if [[ -d "test/${os}" ]]; then
+  for file in $(ls -1 test/${os}/*_test.*); do
     bats -p "${file}"
   done
 fi
