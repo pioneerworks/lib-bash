@@ -159,7 +159,6 @@ __lib::run::exec() {
 
   __lib::run::eval "${run_stdout}" "${run_stderr}" "${command}"
 
-
   while [[
     -n ${LibRun__LastExitCode} && ${LibRun__LastExitCode} -ne 0 &&
     -n ${LibRun__RetryCount}   && ${LibRun__RetryCount}   -gt 0 ]]; do
@@ -276,13 +275,21 @@ lib::run::ask() {
   fi
 }
 
+export LibRun__Inspect__SkipFalseOrBlank=${False}
+
+lib::run::inspect::set-skip-false-or-blank() {
+  local value="${1}"
+  [[ -n "${value}" ]] && export LibRun__Inspect__SkipFalseOrBlank=${value}
+  [[ -z "${value}" ]] && export LibRun__Inspect__SkipFalseOrBlank=${True}
+}
+
 lib::run::inspect-variable() {
   local var_name=${1}
   local var_value=${!var_name}
   local value=""
 
   local print_value=
-  local avail_len=$(($(screen.width) - 50))
+  local avail_len=$(($(screen.width) - 45))
   local lcase_var_name="$(echo ${var_name} | tr 'A-Z' 'a-z')"
 
   local print_value=1
@@ -310,8 +317,12 @@ lib::run::inspect-variable() {
     color="${bldred}"
   fi
 
-  printf "     ${bldylw}%-40s ${txtblk}%s ${color} " ${var_name} "......."
-  avail_len=30
+  if [[ ${LibRun__Inspect__SkipFalseOrBlank} -eq ${True} && "${value}" == "${value_off}" ]]; then
+    return 0
+  fi
+
+  printf "    ${bldylw}%-35s ${txtblk}${color} " ${var_name}
+  [[ ${avail_len} -gt 40 ]] && avail_len=40
 
   if [[ "${print_value}" -eq 1 ]]; then
     if [[ -n "${value}" ]] ; then
