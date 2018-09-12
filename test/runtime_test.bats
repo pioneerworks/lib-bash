@@ -14,3 +14,17 @@ load test_helper
   run "lib::run lssdf"
   [[ "${status}" -eq 127 ]]
 }
+
+@test "inspect variables with names starting with LibRun" {
+  source lib/output.sh
+  source lib/runtime.sh
+  export LibRun__DryRun=${False}
+  run lib::run::inspect-variables-that-are starting-with LibRun
+  echo "TEST ENVIRONMENT:"
+  echo "current folder: $(pwd)"
+  echo "status=${status}"
+  echo "output=${output}"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" =~ "LibRun__DryRun" ]]
+  [[ "${output}" =~ "LibRun__Verbose" ]]
+}

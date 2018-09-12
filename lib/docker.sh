@@ -20,8 +20,8 @@ __lib::docker::output-colors() {
 }
 
 __lib::docker::reset-colors() {
-  printf "${clr}"
-  printf "${clr}" >&2
+  reset-color:
+  reset-color: >&2
 }
 
 __lib::docker::exec() {

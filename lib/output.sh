@@ -44,8 +44,8 @@ lib::output::color::on() {
 }
 
 lib::output::color::off() {
-  printf "${clr}" >&2
-  printf "${clr}" >&1
+  reset-color: >&2
+  reset-color: >&1
 }
 
 __lib::output::screen-width() {
@@ -94,7 +94,7 @@ __lib::output::hr()  {
 
   printf "${color}"
   __lib::output::repeat-char "─"
-  printf "${clr}\n"
+  reset-color
 }
 
 __lib::output::sep() {
@@ -120,7 +120,7 @@ __lib::output::repeat-char() {
 # set background color to something before calling this
 __lib::output::bar() {
   __lib::output::repeat-char " "
-  printf "${clr}\n"
+  reset-color
 }
 
 __lib::output::box-separator() {
@@ -215,7 +215,7 @@ __lib::output::box() {
 
   printf "${border_color}"
   __lib::output::box-bottom
-  printf "${clr}"
+  reset-color:
 }
 
 __lib::output::center() {
@@ -235,7 +235,7 @@ __lib::output::center() {
   __lib::output::repeat-char " " ${remaining_space_len}
   printf "%s" "${text}"
   __lib::output::repeat-char " " $(( ${remaining_space_len} + ${offset} ))
-  printf "${clr}\n"
+  reset-color
   cursor.at.x -1
 }
 
@@ -255,7 +255,6 @@ __lib::output::left-justify() {
     printf -- "  « ${text} »"
     printf -- "  ${clr}\n\n"
   }
-
 }
 
 ################################################################################
@@ -436,14 +435,14 @@ stdout() {
   local file=$1
   printf "\n${txtgrn}"
   [[ -s ${file} ]] && cat ${file}
-  [[ -n ${file} ]] && printf "${clr}\n"
+  [[ -n ${file} ]] && reset-color
 }
 
 stderr() {
   local file=$1
   printf "\n${txtred}"
   [[ -s ${file} ]] && cat ${file}
-  [[ -n ${file} ]] && printf "${clr}\n"
+  [[ -n ${file} ]] && reset-color
 }
 
 duration() {
@@ -555,6 +554,10 @@ shutdown() {
   exit 1
 }
 
-unalias hr 2>/dev/null
+reset-color() {
+  printf "${clr}\n"
+}
 
-set +e
+reset-color:() {
+  printf "${clr}"
+}

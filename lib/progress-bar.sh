@@ -71,7 +71,7 @@ __lib::progress::bar() {
       printf "${LibProgress__BarChar}"
       [[ ${abort_progress_bar} -eq 1 ]] && {
         cursor.rewind
-        printf "${clr}"
+        reset-color:
         __lib::progress::draw-emtpy-bar ${width}
         return 1
       }
@@ -79,7 +79,7 @@ __lib::progress::bar() {
     __lib::progress::draw-emtpy-bar ${width}
     cursor.rewind
   done
-  printf "${clr}"
+  reset-color:
   return 0
 }
 

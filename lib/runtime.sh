@@ -8,8 +8,7 @@
 #——————————————————————————————————————————————————————————————————————————————
 
 # The following "global" variables define how the run framework executes
-# the commands, what it does if the commands fail, etc. 
-
+# the commands, what it does if the commands fail, etc.
 # This variable is set by each call to #run()
 export LibRun__LastExitCode=${False}
 
@@ -21,7 +20,7 @@ export LibRun__AbortOnError__Default=${False}
 export LibRun__ShowCommandOutput__Default=${False}
 export LibRun__AskOnError__Default=${False}
 
-# Maximum number of Retries that can be set via the 
+# Maximum number of Retries that can be set via the
 # LibRun__RetryCount variable before running the command.
 # After running the command, RetryCount is reset to RetryCountDefault.
 export LibRun__RetryCount__Default=${LibRun__RetryCount__Default:-0}
@@ -74,7 +73,7 @@ __lib::run() {
   else
     export LibRun__LastExitCode=
     __lib::run::exec "$@"
-    
+
 
     return ${LibRun__LastExitCode}
   fi
@@ -101,14 +100,14 @@ __lib::run::bundle::exec() {
 }
 
 __lib::run::retry::enforce-max() {
-  [[ -n ${LibRun__RetryCount} && 
-        ${LibRun__RetryCount} -gt ${LibRun__RetryCountMax} ]] && 
+  [[ -n ${LibRun__RetryCount} &&
+        ${LibRun__RetryCount} -gt ${LibRun__RetryCountMax} ]] &&
     export LibRun__RetryCount="${LibRun__RetryCountMax}"
 }
 
 __lib::run::retry::only-codes() {
   export LibRun__RetryExitCodes=($@)
-} 
+}
 
 __lib::run::should-retry-exit-code() {
   local code=$1
@@ -116,7 +115,7 @@ __lib::run::should-retry-exit-code() {
     lib::array::contains-element "${code}" "${array[@]}"
   else
     return 0
-  fi 
+  fi
 }
 
 __lib::run::eval() {
@@ -155,14 +154,14 @@ __lib::run::exec() {
   set +e
 
   local tries=0
-  
+
   start=$(millis)
 
   __lib::run::eval "${run_stdout}" "${run_stderr}" "${command}"
-  
 
-  while [[ 
-    -n ${LibRun__LastExitCode} && ${LibRun__LastExitCode} -ne 0 && 
+
+  while [[
+    -n ${LibRun__LastExitCode} && ${LibRun__LastExitCode} -ne 0 &&
     -n ${LibRun__RetryCount}   && ${LibRun__RetryCount}   -gt 0 ]]; do
     tries=$(( ${tries} + 1 ))
 
@@ -170,9 +169,9 @@ __lib::run::exec() {
 
     export LibRun__RetryCount="$(( ${LibRun__RetryCount} - 1 ))"
     [[ -n ${LibRun__RetrySleep} ]] && sleep ${LibRun__RetrySleep}
- 
+
     [[ ${tries} -eq 1 ]] && {
-      not_ok 
+      not_ok
       echo
     }
 
@@ -279,33 +278,63 @@ lib::run::ask() {
 
 lib::run::inspect-variable() {
   local var_name=${1}
-  local print_value=${2}
   local var_value=${!var_name}
   local value=""
 
+  local print_value=
   local avail_len=$(($(screen.width) - 50))
+  local lcase_var_name="$(echo ${var_name} | tr 'A-Z' 'a-z')"
 
-  if [[ -n "${var_value}" && "${var_value}" == "${True}" ]] ; then
-    value=" ✔︎ "
-    color="${bldgrn}"
-  elif [[ -n "${var_value}" && "${var_value}" == "${False}" ]] ; then
-    value=" ✘ "
+  local print_value=1
+  local color="${bldblu}"
+
+  local value_off=" ✘   "
+  local value_check="✔︎"
+
+  if [[ -n "${var_value}" ]]; then
+    if [[ ${lcase_var_name} =~ 'exit' ]] ; then
+      if [[ ${var_value} -eq 0 ]]; then
+        value=${value_check}; color="${bldgrn}"
+      else
+        print_value=1
+        value=${var_value}
+        color="${bldred}"
+      fi
+    elif [[ "${var_value}" == "${True}" ]] ; then
+      value="${value_check}"; color="${bldgrn}"
+    elif [[ "${var_value}" == "${False}" ]] ; then
+      value="${value_off}" ; color="${bldred}"
+    fi
+  else
+    value="${value_off}"
     color="${bldred}"
-  else
-    print_value=true
-    color="${bldblu}"
   fi
 
-  printf "    ${bldylw}%-40s = ${color}" ${var_name}
-  if [[ -n "${print_value}" ]]; then
-    printf "%-*.*s\n" ${avail_len} ${avail_len} "${var_value}"
+  printf "     ${bldylw}%-40s ${txtblk}%s ${color} " ${var_name} "......."
+  avail_len=30
+
+  if [[ "${print_value}" -eq 1 ]]; then
+    if [[ -n "${value}" ]] ; then
+      printf "%*.*s" ${avail_len} ${avail_len} "${value}"
+    elif $(lib::util::is-numeric "${var_value}"); then
+      avail_len=$(( ${avail_len} - 5 ))
+      if [[ "${var_value}" =~ '.' ]]; then
+        printf "%*.2f" ${avail_len} "${var_value}"
+      else
+        printf "%*d" ${avail_len} "${var_value}"
+      fi
+    else
+      avail_len=$(( ${avail_len} - 5 ))
+      printf "%*.*s" ${avail_len} ${avail_len} "${var_value}"
+    fi
   else
-    printf "%-*.*s\n" ${avail_len} ${avail_len} "${value}"
+    printf "%*.*s" ${avail_len} ${avail_len} "${value}"
   fi
+  echo
 }
 
 lib::run::print-variable() {
-  lib::run::inspect-variable $1 true
+  lib::run::inspect-variable $1
 }
 
 lib::run::inspect-variables() {
@@ -324,17 +353,28 @@ lib::run::print-variables() {
   done
 }
 
+lib::run::variables-starting-with() {
+  local prefix="${1}"
+  env | egrep "^${prefix}" | grep '=' | hbsed 's/=.*//g' | sort
+}
+
+lib::run::variables-ending-with() {
+  local suffix="${1}"
+  env | egrep ".*${suffix}=.*\$" | grep '=' | hbsed 's/=.*//g' | sort
+}
+
+
+# Usage: lib::run::inspect-variables-that-are starting-with LibRun
+lib::run::inspect-variables-that-are() {
+  local pattern_type="${1}" # starting-with or ending-with
+  local pattern="${2}" # actual pattern
+  lib::run::inspect-variables "VARIABLES $(echo ${pattern_type} | tr 'a-z' 'A-Z') ${pattern}" \
+    $(lib::run::variables-${pattern_type} ${pattern} | tr '\n' ' ')
+}
+
 lib::run::inspect() {
   if [[ ${#@} -eq 0 || $(array-contains-element config "$@") == "true" ]]; then
-    lib::run::inspect-variables "CONFIGURATION" \
-    LibRun__AbortOnError__Default \
-    LibRun__AbortOnError \
-    LibRun__AskOnError__Default \
-    LibRun__AskOnError \
-    LibRun__ShowCommandOutput__Default \
-    LibRun__ShowCommandOutput \
-    LibRun__DryRun \
-    LibRun__Verbose
+    lib::run::inspect-variables-that-are starting-with LibRun
   fi
 
   if [[ ${#@} -eq 0 || $(array-contains-element "totals" "$@") == "true" ]]; then
@@ -346,9 +386,10 @@ lib::run::inspect() {
   fi
 
   if [[ ${#@} -eq 0 || $(array-contains-element "current" "$@") == "true" ]]; then
-    lib::run::print-variables "LAST COMMAND" \
-    LibRun__LastExitCode
+    lib::run::inspect-variables-that-are ending-with __LastExitCode
   fi
+
+  reset-color
 }
 
 lib::run() {
