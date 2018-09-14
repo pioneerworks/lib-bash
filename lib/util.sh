@@ -91,7 +91,7 @@ lib::util::remove-from-init-files() {
     is_detail && inf "verifying file ${init_file}..."
     file=${HOME}/${init_file}
     if [[ -f ${file} && -n $(grep "${search}" ${file}) ]] ; then
-      ok:
+      is_detail && ok:
       local matches=$(grep -c "${search}" ${file})
       is_detail && info "file ${init_file} matches with ${bldylw}${matches} matches"
 
@@ -106,7 +106,6 @@ lib::util::remove-from-init-files() {
     else
       is_detail && not_ok:
     fi
-
   done
   return ${LibRun__LastExitStatus}
 }
