@@ -11,6 +11,7 @@
 # the commands, what it does if the commands fail, etc.
 # This variable is set by each call to #run()
 export LibRun__LastExitCode=${False}
+export LibRun__Detail=${False}
 
 # You can globally set these constants below to alternatives, and they will be
 # used after each #run() call as the basis for the library variables that
@@ -444,4 +445,20 @@ odie() {
 
 safe_cd() {
   cd "$@" >/dev/null || odie "Error: failed to cd to $*!"
+}
+
+is_verbose() {
+  [[ ${LibRun__Verbose} -eq ${True} ]]
+}
+
+is_detail() {
+  [[ ${LibRun__Detail} -eq ${True} ]]
+}
+
+more_detail() {
+  export LibRun__Detail=${True}
+}
+
+less_detail() {
+  export LibRun__Detail=${False}
 }

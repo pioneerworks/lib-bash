@@ -46,7 +46,6 @@ lib::util::append-to-init-files() {
   is_installed=
 
   declare -a shell_files=($(lib::util::shell-init-files))
-
   for init_file in ${shell_files[@]}; do
     file=${HOME}/${init_file}
     [[ -f ${file} && -n $(grep "${search}" ${file}) ]] && {
@@ -67,6 +66,49 @@ lib::util::append-to-init-files() {
   fi
 
   printf "${is_installed}"
+}
+
+# Description:
+#   This function checks BASH init files one by one for a given string.
+#   It then removes all lines matching that string from those files.
+#
+# Usage:
+#   lib::util::remove-froj-init-files direnv
+#
+# Will remove all lines matching direnv from all Bash init files.
+#
+lib::util::remove-from-init-files() {
+  local search="${1}" # lines matching this will be deleted
+  local backup_extension="${2}"
+
+  [[ -z ${backup_extension} ]] && backup_extension="$(epoch).backup"
+
+  [[ -z ${search} ]] && return
+
+  declare -a shell_files=($(lib::util::shell-init-files))
+  local temp_holder=$(mktemp)
+  for init_file in ${shell_files[@]}; do
+    is_detail && inf "verifying file ${init_file}..."
+    file=${HOME}/${init_file}
+    if [[ -f ${file} && -n $(grep "${search}" ${file}) ]] ; then
+      ok:
+      local matches=$(grep -c "${search}" ${file})
+      is_detail && info "file ${init_file} matches with ${bldylw}${matches} matches"
+
+      run "grep -v \"${search}\" ${file} > ${temp_holder}"
+      if [[ -n "${backup_extension}" ]]; then
+        local backup="${file}.${backup_extension}"
+
+        is_detail && info "backup file will created in ${bldylw}${backup}"
+        [[ -n "${do_backup_changes}" ]] && "mv ${file} ${backup}"
+      fi
+      run "cp -v ${temp_holder} ${file}"
+    else
+      is_detail && not_ok:
+    fi
+
+  done
+  return ${LibRun__LastExitStatus}
 }
 
 lib::util::whats-installed() {

@@ -461,7 +461,7 @@ ok() {
 
 not_ok() {
   __lib::output::cursor-left-by 1000
-  printf " ${bldred}☠ ${clr}"
+  printf " ${bldred}✘ ${clr}"
 }
 
 kind_of_ok() {
@@ -494,12 +494,12 @@ okay() {
 }
 
 success() {
-  printf -- "    ${bldwht}${bakgrn} « SUCCESS » ${clr} ${bldgrn}$*${clr}" >&2
+  printf -- "    ${bakgrn}${bldylw}  « SUCCESS »  ${clr} ${bldgrn}$*${clr}" >&2
   echo
 }
 
 err() {
-  printf -- "    ${bldwht}${bakred} « ERROR » ${clr} ${bldred}$*${clr}" >&2
+  printf -- "    ${bldylw}${bakred}  « ERROR »  ${clr} ${bldred}$*${clr}" >&2
 }
 
 inf() {
@@ -527,7 +527,7 @@ info() {
 }
 
 error() {
-  header=$(printf -- "${bldwht}${bakred} « ERROR » ${clr}")
+  header=$(printf -- "${txtblk}${bakred} « ERROR » ${clr}")
   box::red-in-red "${header} ${bldylw}$@" >&2
 }
 
