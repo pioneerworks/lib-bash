@@ -462,3 +462,16 @@ more_detail() {
 less_detail() {
   export LibRun__Detail=${False}
 }
+
+is_ask_on_error() {
+  [[ ${LibRun__AskOnError} -eq ${True} ]]
+}
+
+show_command_output() {
+  export LibRun__ShowCommandOutput=${True}
+}
+
+show_next_commands_output() {
+  export LibRun__ShowCommandOutput=${True}
+  export LibRun__ShowCommandOutput__Default=${True}
+}
