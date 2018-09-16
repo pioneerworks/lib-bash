@@ -263,8 +263,12 @@ lib::run::ask() {
 
   inf "${bldcyn}${question}${clr} [Y/n] ${bldylw}"
 
-  read a
-
+  read a 2>/dev/null
+  code=$?
+  if [[ ${code} != 0 ]]; then
+    error "Unable to read from STDIN."
+    exit 12
+  fi
   echo
   if [[ ${a} == 'y' || ${a} == 'Y' || ${a} == '' ]]; then
     info: "${txtgrn}Great, let's do this ☺ "
