@@ -336,10 +336,13 @@ box::green-in-magenta() {
   __lib::output::box "${bldgrn}" "${bldpur}" "$@"
 }
 
+box::red-in-magenta() {
+  __lib::output::box "${bldred}" "${bldpur}" "$@"
+}
+
 box::green-in-green() {
   __lib::output::box "${bldgrn}" "${bldgrn}" "$@"
 }
-
 
 box::magenta-in-green() {
   __lib::output::box "${bldpur}" "${bldgrn}" "$@"
