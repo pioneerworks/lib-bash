@@ -10,6 +10,7 @@ source lib/util.sh
   touch ${LibGem__GemListCache}
   cp -f test/Gemfile.lock .
   result=$(lib::gem::gemfile::version activesupport)
+  echo "result is [${result}]"
   [[ "${result}" == "5.0.7" ]]
   [[ -d test ]] && ( rm -f Gemfile.lock ; true ) 
 } 
