@@ -14,15 +14,17 @@ lib::gem::version() {
   local default=$2
   local version
 
-  if [[ -f './Gemfile.lock' ]]; then
-    version=$(egrep "${gem} \(\d+\.\d+\.\d+\(\.\d+\)?\)" Gemfile.lock | awk '{print $2}' | hbsed 's/[()]//g')
+  [[ -z ${gem} ]] && return
+
+  if [[ -f Gemfile.lock ]]; then
+    version=$(egrep  "^    ${gem} \(\d+\.\d+\.\d+(\.\d+)?\)" Gemfile.lock | awk '{print $2}' | hbsed 's/[()]//g')
   else
     lib::gem::cache-installed
     version=$(cat ${LibGem__GemListCache} | egrep "${gem}" | awk '{print $2}' | hbsed -E 's/[(),]//g')
   fi
 
   version=${version:-${default}} # fallback to the default if not found
-  printf "%s" ${version}
+  printf "%s" "${version}"
 }
 
 # this ensures the cache is only at most 30 minutes old
