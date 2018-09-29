@@ -4,13 +4,14 @@ source lib/hbsed.sh
 source lib/gem.sh
 source lib/util.sh
 
-@test "lib::gem::version returns correct version" {
+@test "lib::gem::gemfile::version returns correct version" {
   export LibGem__GemListCache=/tmp/gem_list_test.txt
+  rm -f ${LibGem__GemListCache}
   touch ${LibGem__GemListCache}
   cp -f test/Gemfile.lock .
-  result=$(lib::gem::version activesupport)
+  result=$(lib::gem::gemfile::version activesupport)
   [[ "${result}" == "5.0.7" ]]
-  [[ -d test ]] && rm -f Gemfile.lock && true
+  [[ -d test ]] && ( rm -f Gemfile.lock ; true ) 
 } 
 
 @test "lib::gem::global::latest-version returns the correct version" {
