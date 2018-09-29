@@ -12,19 +12,52 @@ export LibGem__GemInstallFlags="--no-ri --no-rdoc --force --quiet"
 lib::gem::version() {
   local gem=$1
   local default=$2
+
+  [[ -z ${gem} ]] && return
+
   local version
+  [[ -f Gemfile.lock ]] && version=$(lib::gem::gemfile::version ${gem})
+  [[ -z ${version} ]] && version=$(lib::gem::global::latest-version ${gem})
+  [[ -z ${version} && -n ${default} ]] && version=${default} # fallback to the default if not found
+
+  printf "%s" "${version}"
+}
+
+# Returns a space-separated list of installed gem versions
+lib::gem::global::versions() {
+  local gem=$1
+  [[ -z ${gem} ]] && return
+  lib::gem::cache-installed
+  cat ${LibGem__GemListCache} | egrep "^${gem} " | hbsed "s/^${gem} //g;s/[(),]//g"
+}
+
+# Returns a space-separated list of installed gem versions
+lib::gem::global::latest-version() {
+  local gem=$1
+  [[ -z ${gem} ]] && return
+
+  declare -a versions=($(lib::gem::global::versions ${gem}))
+
+  local max=0
+  local max_version=
+  for v in ${versions[@]}; do
+    vi=$(lib::util::ver-to-i ${v})
+    if [[ ${vi} -gt ${max} ]] ; then
+      max=${vi}
+      max_version=${v}
+    fi
+  done
+  printf "%s" "${max_version}"
+}
+
+lib::gem::gemfile::version() {
+  local gem=$1
 
   [[ -z ${gem} ]] && return
 
   if [[ -f Gemfile.lock ]]; then
-    version=$(egrep  "^    ${gem} \(\d+\.\d+\.\d+(\.\d+)?\)" Gemfile.lock | awk '{print $2}' | hbsed 's/[()]//g')
-  else
-    lib::gem::cache-installed
-    version=$(cat ${LibGem__GemListCache} | egrep "${gem}" | awk '{print $2}' | hbsed -E 's/[(),]//g')
+    egrep  "^    ${gem} \(\d+\.\d+\.\d+(\.\d+)?\)" Gemfile.lock | awk '{print $2}' | hbsed 's/[()]//g'
   fi
-
-  version=${version:-${default}} # fallback to the default if not found
-  printf "%s" "${version}"
 }
 
 # this ensures the cache is only at most 30 minutes old
