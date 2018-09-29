@@ -5,6 +5,8 @@ source lib/gem.sh
 source lib/util.sh
 
 @test "lib::gem::version returns correct version" {
+  export LibGem__GemListCache=/tmp/gem_list_test.txt
+  touch ${LibGem__GemListCache}
   cp -f test/Gemfile.lock .
   result=$(lib::gem::version activesupport)
   [[ "${result}" == "5.0.7" ]]

@@ -109,7 +109,7 @@ lib::gem::install() {
   local gem_version_flags=
   local gem_version_name=
 
-  gem_version=$(lib::gem::version ${gem_name} ${gem_version})
+  gem_version=${gem_version:-$(lib::gem::version ${gem_name})}
 
   if [[ -z ${gem_version} ]]; then
     gem_version_name=latest
