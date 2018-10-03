@@ -27,6 +27,7 @@ declare -a HomebaseBrewCasks=(
 export HomebaseBrewCasks
 
 declare -a HomebaseBrewPackages=(
+    ag
     autoconf
     autogen
     automake
@@ -44,11 +45,12 @@ declare -a HomebaseBrewPackages=(
     jq
     memcached
     openssl
-    phantomjs
     rbenv
     redis
     ruby-build
+    screen
     the_silver_searcher
+    tmux
     wget
     yarn
   )
