@@ -12,11 +12,8 @@ source lib/hbsed.sh
   touch ${LibGem__GemListCache}
   cp -f test/Gemfile.lock .
   result=$(lib::gem::gemfile::version activesupport)
-  echo "result is [${result}], pwd is $(pwd), gemfile is $(ls -al Gemfile.lock)"
-  echo "doing grep:"
-  grep -e "^    activesupport \(\d+\.\d+\.\d+(\.\d+)?\)" Gemfile.lock
   [[ "${result}" == "5.0.7" ]]
-  [[ -d test ]] && ( rm -f Gemfile.lock ; true ) 
+  [[ -d test && -f Gemfile.lock ]] && ( rm -f Gemfile.lock ; true ) 
 } 
 
 @test "lib::gem::global::latest-version returns the correct version" {

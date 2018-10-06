@@ -56,7 +56,7 @@ lib::gem::gemfile::version() {
   [[ -z ${gem} ]] && return
 
   if [[ -f Gemfile.lock ]]; then
-    egrep  "^    ${gem} \(\d+\.\d+\.\d+(\.\d+)?\)" Gemfile.lock | awk '{print $2}' | hbsed 's/[()]//g'
+    egrep "^    ${gem} \([0-9]+\.[0-9]+\.[0-9]\)" Gemfile.lock | awk '{print $2}' | hbsed 's/[()]//g'
   fi
 }
 
