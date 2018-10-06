@@ -14,7 +14,7 @@ source lib/hbsed.sh
   result=$(lib::gem::gemfile::version activesupport)
   echo "result is [${result}], pwd is $(pwd), gemfile is $(ls -al Gemfile.lock)"
   echo "doing grep:"
-  egrep  "^    activesupport \(\d+\.\d+\.\d+(\.\d+)?\)" Gemfile.lock | gawk '{print $2}' | hbsed 's/[()]//g'
+  grep -e "^    activesupport \(\d+\.\d+\.\d+(\.\d+)?\)" Gemfile.lock
   [[ "${result}" == "5.0.7" ]]
   [[ -d test ]] && ( rm -f Gemfile.lock ; true ) 
 } 
