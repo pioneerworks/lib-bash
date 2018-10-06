@@ -3,9 +3,9 @@ before_install:
   - rm -f lib-bash.log
   - set -e 
 script: 
-  - bin/specs > lib-bash.log
-after_script:
+  - (bin/specs && code=$?) | tee -a lib-bash.log
   - cat lib-bash.log
+  - exit ${code}
 notifications:
   webhooks:
     urls:
