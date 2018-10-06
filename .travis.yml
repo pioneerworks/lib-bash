@@ -1,11 +1,5 @@
 language: c
-before_install:
-  - rm -f lib-bash.log
-  - set -e 
-script: 
-  - (bin/specs && code=$?) | tee -a lib-bash.log
-  - cat lib-bash.log
-  - exit ${code}
+script: bin/specs
 notifications:
   webhooks:
     urls:
