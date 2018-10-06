@@ -4,13 +4,15 @@ source lib/hbsed.sh
 source lib/gem.sh
 source lib/util.sh
 
+set -e
+
 @test "lib::gem::gemfile::version returns correct version" {
   export LibGem__GemListCache=/tmp/gem_list_test.txt
   rm -f ${LibGem__GemListCache}
   touch ${LibGem__GemListCache}
   cp -f test/Gemfile.lock .
   result=$(lib::gem::gemfile::version activesupport)
-  echo "result is [${result}], pwd is $(pwd), gemfile is $(ls -al Gemfile.lock)"
+  echo "result is [${result}], pwd is $(pwd), gemfile is $(ls -al Gemfile.lock), grep: $(grep activesupport Gemfile.lock)"
   [[ "${result}" == "5.0.7" ]]
   [[ -d test ]] && ( rm -f Gemfile.lock ; true ) 
 } 
