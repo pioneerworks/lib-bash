@@ -21,7 +21,7 @@ done
 
 export os=$(uname -s | tr [A-Z] [a-z])
 
-if [[ -d "test/${os}" ]]; then
+if [[ -d "test/${os}" && -n $(ls -1 test/${os}) ]]; then
   for file in $(ls -1 test/${os}/*_test.*); do
     bats -p "${file}"
   done
