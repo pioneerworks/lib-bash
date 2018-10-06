@@ -1,7 +1,9 @@
 language: c
 before_install:
   - rm -f lib-bash.log
-script: bin/specs | tee -a lib-bash.log
+  - set -e 
+script: 
+  - bin/specs > lib-bash.log
 after_script:
   - cat lib-bash.log
 notifications:
