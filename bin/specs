@@ -67,7 +67,7 @@ run-spec() {
   fi
 }
 
-if [[ ${ConfigJoinFiles} -eq ${True} ]] ; then
+if [[ ${ConfigJoinFiles} -eq ${False} ]] ; then
   h2 "Running Tests one file at a time."
   trap '' EXIT
 else
@@ -98,6 +98,6 @@ fi
 
 set -e
 
-[[ -n ${ConfigJoinFiles} ]] && bats -p "${SingleTestFile}"
+[[ ${ConfigJoinFiles} -eq ${True} ]] && bats -p "${SingleTestFile}"
 
 

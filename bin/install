@@ -50,7 +50,9 @@ debug_log() {
 debug_log "using downloader ${bldylw}${LibBash__Downloader}"
 
 lib::bash::clean-old-bootstrap() {
-  find ${LibBash__BinPath} -mmin +1440 -type f -name ${LibBash__BootstrapExec} -print -exec rm {} \;
+  if [[ -d ${LibBash__BinPath} ]] ; then
+    find ${LibBash__BinPath} -mmin +1440 -type f -name ${LibBash__BootstrapExec} -print -exec rm {} \;
+  fi
 }
 
 lib::bash::bootstrap() {

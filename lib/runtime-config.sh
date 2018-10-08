@@ -16,17 +16,29 @@
 #
 # Well, now the equivalent is this command:
 #
-#     $ run::set-next-command show-output-on abort-on-error
+#     $ run::set-next show-output-on abort-on-error
 #
 # To set the "default" values that affect all subasequent comands,
-# use +run::set-all-commands
+# use run::set-all.
 
-run::set-next-command() {
+run::set-next() {
   ____run::configure next "$@"
 }
 
-run::set-all-commands() {
+run::set-all() {
   ____run::configure all "$@"
+}
+
+run::set-next::list() {
+  set | egrep '^____run::set::next' | awk 'BEGIN{FS="::"}{print $4}' | hbsed 's/[() ]//g'
+}
+
+run::set-all::list() {
+  set | egrep '^____run::set::all' | awk 'BEGIN{FS="::"}{print $4}' | hbsed 's/[() ]//g'
+}
+
+run::inspect() {
+  lib::run::inspect
 }
 
 ### ———————————————————————————————————————————— PRIVATE METHODS ——————————————
@@ -56,16 +68,16 @@ ____run::set::next::continue-on-error() {
   export LibRun__AskOnError=${False}
   export LibRun__AbortOnError=${False}
 }
-____run::set::next::dry-run-on() {
+____run::set::all::dry-run-on() {
   export LibRun__DryRun=${True}
 }
-____run::set::next::dry-run-off() {
+____run::set::all::dry-run-off() {
   export LibRun__DryRun=${False}
 }
-____run::set::next::verbose-on() {
+____run::set::all::verbose-on() {
   export LibRun__Verbose=${True}
 }
-____run::set::next::verbose-off() {
+____run::set::all::verbose-off() {
   export LibRun__Verbose=${False}
 }
 
@@ -103,12 +115,28 @@ ____run::configure() {
 
   shift
 
+  [[ -z "$*" ]] && {
+    ____run::list-options ${type}
+    return
+  }
+
   for feature in $@; do
     local func="____run::set::${type}::${feature}"
     if [[ -z $(type ${func} 2>/dev/null) ]]; then
-      error "LibRun feature ${feature} is not recognized."
+      error "LibRun feature was not recognized:" "${feature}"
+      ____run::list-options ${type}
       return 1
     fi
     ${func}
   done
+}
+____run::list-options() {
+  local type=$1
+  local func="run::set-${type}::list"
+  local prefix="    • "
+  info "List of available configuration features for ${type} command(s):\n"
+  printf "${prefix}"
+
+  eval ${func} | tr '\n' ',' | hbsed 's/,$//g' | hbsed "s/,/\\n${prefix}/g"
+  echo
 }
