@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-source lib/hbsed.sh
+load test_helper
 
 function moo() {
   echo "config/moo.enc" | hbsed 's/\.(sym|enc)$//g'

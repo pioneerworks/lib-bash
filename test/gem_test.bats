@@ -1,9 +1,5 @@
 #!/usr/bin/env bats
-
-source lib/gem.sh
-source lib/util.sh
-source lib/hbsed.sh
-
+load test_helper
 
 @test "lib::gem::gemfile::version returns correct version" {
   set -e
