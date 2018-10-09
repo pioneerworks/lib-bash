@@ -85,6 +85,8 @@ if [[ ! -d ${BatsRoot} ]]; then
   cd ${ProjectRoot}
 fi
 
+set -e
+
 for file in $(ls -1 test/*_test.*); do
   run-spec ${file} 
 done
@@ -96,8 +98,8 @@ if [[ -d "test/${os}" && -n $(ls -1 test/${os}) ]]; then
   done
 fi
 
-set -e
-
-[[ ${ConfigJoinFiles} -eq ${True} ]] && bats -p "${SingleTestFile}"
+if [[ ${ConfigJoinFiles} -eq ${True} ]]; then 
+  bats -p "${SingleTestFile}"
+fi
 
 
