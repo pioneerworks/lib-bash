@@ -420,6 +420,10 @@ h2() {
   box::blue-in-green "$@"
 }
 
+h3() {
+  hl::subtle "$@"
+}
+
 hdr() {
   h1 "$@"
 }
