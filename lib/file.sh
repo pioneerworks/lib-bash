@@ -25,7 +25,6 @@ __lib::file::size_bytes() {
   local file=$1
   printf $(($(wc -c < $file) + 0))
 }
-
 # Usage:
 #   (( $(lib::file::exists_and_newer_than "/tmp/file.txt" 30) )) && echo "Yes!"
 lib::file::exists_and_newer_than() {
@@ -61,6 +60,34 @@ lib::file::install_with_backup() {
 lib::file::last-modified-date() {
   stat -f "%Sm" -t "%Y-%m-%d" "$1"
 }
+
 lib::file::last-modified-year() {
   stat -f "%Sm" -t "%Y" "$1"
 }
+
+# Return one field of stat -s call on a given file.
+file::stat() {
+  local file="$1"
+  local field="$2"
+
+  [[ -f ${file} ]] || {
+    error "file ${file} is not found. Usage: file::stat <filename> <stat-field-name>"
+    info "eg: ${bldylw}file::stat README.md st_size"
+    return 1
+  }
+  
+  [[ -n ${field} ]] || {
+    error "Second argument field is required."
+    info "eg: ${bldylw}file::stat README.md st_size"
+    return 2
+  }
+
+  # use stat and add local so that all variables created are not global
+  eval $(stat -s ${file} | tr ' ' '\n' | sed 's/^/local /g')
+  echo ${!field}
+}
+
+file::size() {
+  file::stat "$1" st_size
+}
+

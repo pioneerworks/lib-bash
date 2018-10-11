@@ -1,13 +1,21 @@
 
-# breaks up a file containing a pasted cookie into individual cookies sorted
-# by cookie size
+# Breaks up a file containing a pasted cookie into individual cookies sorted
+# by cookie size. To use, either pass a file name as an argument, or have
+# the cookie copied into the clipboard.
 lib::osx::cookie-dump() {
   local file="$1"
   local tmp
+
   if [[ ! -s ${file} ]]; then
     tmp=$(mktemp)
     file=${tmp}
     pbpaste > ${file}
+    local size=$(file::size ${file})
+    if [[ ${size} -lt 4 ]] ; then
+      error "Pasted data is too small to be a valid cookie?"
+      info "Here is what we got in your clipboard:\n\n$(cat ${file})\n"
+      return 1
+    fi
   fi
 
   if [[ -s ${file} ]]; then
@@ -17,7 +25,9 @@ lib::osx::cookie-dump() {
       awk 'BEGIN{FS="="}{printf( "%10d = %s\n", length($2), $1) }' | \
       sort -n
   else
-    info "File ${file} does not exist or is empty"
+    info "File ${file} does not exist or is empty. "
+    info "Copy the value of the ${bldylw}Set-Cookie:${txtblu} header into the clipboard,"
+    info "and rerun this function."
   fi
 
   [[ -z ${tmp} ]] || rm -f ${tmp}
