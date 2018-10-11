@@ -1,4 +1,33 @@
 
+# breaks up a file containing a pasted cookie into individual cookies sorted
+# by cookie size
+lib::osx::cookie-dump() {
+  local file="$1"
+  local tmp
+  if [[ ! -s ${file} ]]; then
+    tmp=$(mktemp)
+    file=${tmp}
+    pbpaste > ${file}
+  fi
+
+  if [[ -s ${file} ]]; then
+    cat "${file}" | \
+      tr '; ' '\n' | \
+      sed '/^$/d' | \
+      awk 'BEGIN{FS="="}{printf( "%10d = %s\n", length($2), $1) }' | \
+      sort -n
+  else
+    info "File ${file} does not exist or is empty"
+  fi
+
+  [[ -z ${tmp} ]] || rm -f ${tmp}
+
+}
+
+cookie-dump() {
+  lib::osx::cookie-dump "$@"
+}
+
 lib::osx::display::change-underscan() {
   set +e
   local amount_percentage="$1"
