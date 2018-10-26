@@ -133,3 +133,20 @@ lib::util::functions-matching() {
 lib::util::checksum::files() {
   cat $* | shasum | awk '{print $1}'
 }
+
+lib::util::install-direnv() {
+  [[ -n $(which direnv) ]] || {
+    lib::brew::install::package direnv
+  }
+
+  local init_file=
+  local init_file=$(lib::util::append-to-init-files 'eval "$(direnv hook bash)"; export DIRENV_LOG_FORMAT=' 'direnv hook')
+  if [[ -f ${init_file} ]] ; then
+    info: "direnv init has been appended to ${bldylw}${init_file}"
+  else
+    error: "direnv init could not be appended"
+  fi
+
+  eval "$(direnv hook bash)"
+}
+
