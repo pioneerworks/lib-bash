@@ -52,6 +52,7 @@ declare -a HomebaseBrewPackages=(
     the_silver_searcher
     tmux
     wget
+    webpack
     yarn
   )
 
