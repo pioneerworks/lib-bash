@@ -6,7 +6,7 @@ export False="0"
 export HomebaseNodeVersion="9.4.0"
 export HomebaseNvmVersion="0.33.2"
 
-export HomebasePostgresVersion="9.4"
+export HomebasePostgresVersion=${PostgreSQLVersion:-"9.4"}
 export HomebasePostgresHostname="localhost"
 export HomebasePostgresUsername="postgres"
 

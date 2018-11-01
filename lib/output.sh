@@ -292,6 +292,10 @@ lib::output::is_terminal() {
   lib::output::is_tty || lib::output::is_redirect || lib::output::is_pipe
 }
 
+lib::output::is_ssh() {
+  [[ -n "${SSH_CLIENT}" || -n "${SSH_CONNECTION}" ]]
+}
+
 lib::output::is_tty() {
   [[ -t 1 ]]
 }
@@ -518,7 +522,7 @@ warn() {
 }
 
 warning() {
-  header=$(printf -- "${bldwht}${bakylw} « WARNING » ${clr}")
+  header=$(printf -- "${txtblk}${bakylw} « WARNING » ${clr}")
   box::yellow-in-yellow "${header} ${bldylw}$*" >&2
 }
 
