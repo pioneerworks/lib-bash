@@ -58,11 +58,11 @@ lib::file::install_with_backup() {
 }
 
 lib::file::last-modified-date() {
-  stat -f "%Sm" -t "%Y-%m-%d" "$1"
+  date -r $1 "+%Y-%m-%d"
 }
 
 lib::file::last-modified-year() {
-  stat -f "%Sm" -t "%Y" "$1"
+  date -r $1 "+%Y"
 }
 
 # Return one field of stat -s call on a given file.
