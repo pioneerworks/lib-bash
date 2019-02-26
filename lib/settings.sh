@@ -48,6 +48,7 @@ declare -a HomebaseBrewPackages=(
     rbenv
     redis
     ruby-build
+    rsync
     screen
     the_silver_searcher
     tmux
