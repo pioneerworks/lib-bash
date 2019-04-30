@@ -33,8 +33,8 @@ export LibBash__BootstrapURL="${LibBash__GithubURL}/${LibBash__Branch}/bin/${Lib
 
 unset LibBash__Downloader
 
-[[ -z ${LibBash__Downloader} && -n $(which curl) ]] && export LibBash__Downloader="curl -fsSL --connect-timeout 5 "
-[[ -z ${LibBash__Downloader} && -n $(which wget) ]] && export LibBash__Downloader="wget -q -O --connect-timeout=5 - "
+[[ -z ${LibBash__Downloader} && -n $(which curl) ]] && export LibBash__Downloader="-fsSL --connect-timeout 5 --retry-delay 10 --retry-max-time 300 --retry 15"
+[[ -z ${LibBash__Downloader} && -n $(which wget) ]] && export LibBash__Downloader="-q --connect-timeout=5 --retry-connrefused --tries=15 -O -"
 
 [[ -z "${LibBash__Downloader}" ]] && {
   printf "Error: can't figure out how to download things. No curl or wget found."
