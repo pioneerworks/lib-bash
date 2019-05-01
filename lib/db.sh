@@ -5,6 +5,7 @@
 
 export RAILS_SCHEMA_RB="db/schema.rb"
 export RAILS_SCHEMA_SQL="db/structure.sql"
+export PGCLUSTER="${HomebasePostgresVersion}/main"
 
 __lib::db::current_settings() {
   psql $* -X -q -c 'show all' | sort | awk '{ printf("%s=%s\n", $1, $3) }' | sed -E 's/[()\-]//g;/name=setting/d;/^[-+=]*$/d;/^[0-9]*=$/d'
@@ -282,10 +283,6 @@ lib::db::dump() {
     info "saving to...: ${bldylw}${filename}"
   }
 
-  if [[ -f /usr/share/postgresql-common/pg_wrapper ]]; then
-    psql_args="--cluster ${HomebasePostgresVersion}/main ${psql_args}"
-  fi
-
   cmd="pg_dump -Fc -Z5 ${psql_args} -f ${filename} ${dbname}"
   run "${cmd}"
 
@@ -324,10 +321,6 @@ lib::db::restore() {
     info "restoring from..: ${bldylw}${filename}"
     info "restoring to....: ${bldylw}${dbname}"
   }
-
-  if [[ -f /usr/share/postgresql-common/pg_wrapper ]]; then
-    psql_args="--cluster ${HomebasePostgresVersion}/main ${psql_args}"
-  fi
 
   run "pg_restore -Fc -j 8 ${psql_args} -d ${dbname} ${filename}"
   code=${LibRun__LastExitCode}
