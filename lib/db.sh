@@ -282,7 +282,11 @@ lib::db::dump() {
     info "saving to...: ${bldylw}${filename}"
   }
 
-  cmd="pg_dump --cluster ${PostgreSQLVersion}/main -Fc -Z5 ${psql_args} -f ${filename} ${dbname}"
+  if [[ -f /usr/share/postgresql-common/pg_wrapper ]]; then
+    psql_args="--cluster ${HomebasePostgresVersion}/main ${psql_args}"
+  fi
+
+  cmd="pg_dump -Fc -Z5 ${psql_args} -f ${filename} ${dbname}"
   run "${cmd}"
 
   code=${LibRun__LastExitCode}
@@ -321,7 +325,11 @@ lib::db::restore() {
     info "restoring to....: ${bldylw}${dbname}"
   }
 
-  run "pg_restore --cluster ${PostgreSQLVersion}/main -Fc -j 8 ${psql_args} -d ${dbname} ${filename}"
+  if [[ -f /usr/share/postgresql-common/pg_wrapper ]]; then
+    psql_args="--cluster ${HomebasePostgresVersion}/main ${psql_args}"
+  fi
+
+  run "pg_restore -Fc -j 8 ${psql_args} -d ${dbname} ${filename}"
   code=${LibRun__LastExitCode}
 
   if [[ ${code} != 0 ]]; then
