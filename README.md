@@ -85,7 +85,7 @@ The output from the above script would be something like this:
 
 ```
     installing sym (2.8.4)...
- ✔︎  3.1s ❯ gem install sym --version 2.8.4 --no-ri --no-rdoc --force --quiet
+ ✔︎  3.1s ❯ gem install sym --version 2.8.4 --no-document --force --quiet
  ✔︎  1.3s ❯ gem list > /tmp/gem_list.txt
  ✔︎  checking brew package curl
 Version installed is 2.8.2
