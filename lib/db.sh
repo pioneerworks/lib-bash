@@ -308,10 +308,10 @@ lib::db::restore() {
   [[ -s ${filename} ]] || {
     error "can't find valid backup file in ${bldylw}${filename}"; return 2; }
 
-  psql_args=$(lib::db::psql::args::default)
+  psql_args=$(lib::db::psql::args::homebase)
   maint_args=$(lib::db::psql::args::maint)
 
-  run "dropdb ${maint_args} ${dbname} 2>/dev/null; true"
+  run "dropdb ${psql_args} ${maint_args} ${dbname} 2>/dev/null; true"
 
   export LibRun__AbortOnError=${True}
   run "createdb ${maint_args} ${dbname} ${psql_args}"
