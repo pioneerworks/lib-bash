@@ -5,7 +5,6 @@
 
 export RAILS_SCHEMA_RB="db/schema.rb"
 export RAILS_SCHEMA_SQL="db/structure.sql"
-export PGCLUSTER="${HomebasePostgresVersion}/main"
 
 __lib::db::current_settings() {
   psql $* -X -q -c 'show all' | sort | awk '{ printf("%s=%s\n", $1, $3) }' | sed -E 's/[()\-]//g;/name=setting/d;/^[-+=]*$/d;/^[0-9]*=$/d'
