@@ -118,7 +118,7 @@ __lib::db::is_valid() {
   local dbname="${1}"
   [[ -z ${dbname} ]] && return 1
 
-  psql -U postgres -h localhost -c 'select count(*) from accounts' ${dbname} 1>/dev/null 2>/dev/null
+  psql $(lib::db::psql::args::homebase) -c 'select count(*) from accounts' ${dbname} 1>/dev/null 2>/dev/null
   code=$?
   return ${code}
 }
