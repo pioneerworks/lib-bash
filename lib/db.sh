@@ -49,10 +49,6 @@ lib::db::psql::args::default() {
   printf -- "-U postgres -h localhost $*"
 }
 
-lib::db::psql::args::maint() {
-  printf -- "-U postgres -h localhost --maintenance-db=postgres $*"
-}
-
 __lib::db::args_for() {
   declare -a results=( $(__lib::db::by_shortname $1) )
   if [[ ${#results[@]} -gt 1 ]]; then
@@ -273,7 +269,7 @@ lib::db::dump() {
   local dbname=${1:-'homebase_development'}; shift
   local psql_args="$*"
 
-  [[ -z "${psql_args}" ]] && psql_args="-U postgres -h localhost"
+  [[ -z "${psql_args}" ]] && psql_args=$(lib::db::psql::args::homebase)
   local filename=$(__lib::db::backup-filename ${dbname})
   [[ $? != 0 ]] && return
 
@@ -309,12 +305,11 @@ lib::db::restore() {
     error "can't find valid backup file in ${bldylw}${filename}"; return 2; }
 
   psql_args=$(lib::db::psql::args::homebase)
-  maint_args=$(lib::db::psql::args::maint)
 
-  run "dropdb ${psql_args} ${maint_args} ${dbname} 2>/dev/null; true"
+  run "dropdb ${psql_args} ${dbname} 2>/dev/null; true"
 
   export LibRun__AbortOnError=${True}
-  run "createdb ${maint_args} ${dbname} ${psql_args}"
+  run "createdb ${dbname} ${psql_args}"
 
   [[ ${LibRun__Verbose} -eq ${True} ]] && {
     info "restoring from..: ${bldylw}${filename}"
