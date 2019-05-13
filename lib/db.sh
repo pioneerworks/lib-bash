@@ -49,6 +49,10 @@ lib::db::psql::args::default() {
   printf -- "-U postgres -h localhost $*"
 }
 
+lib::db::psql::args::maint() {
+  printf -- "-U postgres -h localhost --maintenance-db=postgres $*"
+}
+
 __lib::db::args_for() {
   declare -a results=( $(__lib::db::by_shortname $1) )
   if [[ ${#results[@]} -gt 1 ]]; then
