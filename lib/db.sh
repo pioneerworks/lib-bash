@@ -38,7 +38,11 @@ __lib::db::by_shortname() {
 }
 
 lib::db::psql::args::homebase() {
-  printf -- "-U ${HomebasePostgresUsername} -h ${HomebasePostgresHostname} $*"
+  local cluster_args
+  if hash pg_ctlcluster 2>/dev/null; then
+     cluster_args=" --cluster ${PGCLUSTER}"
+  fi
+  printf -- "-U ${HomebasePostgresUsername} -h ${HomebasePostgresHostname}${cluster_args} $*"
 }
 
 lib::db::psql-args() {
