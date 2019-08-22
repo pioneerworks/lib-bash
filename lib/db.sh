@@ -273,6 +273,15 @@ lib::db::top() {
   done
 }
 
+lib::db::activity() {
+  local dbname=$@
+
+  h1 "Please wait while we resolve DB names using AWSCLI..."
+
+  dbname=$(__lib::db::by_shortname ${dbname})
+  pg_activity -h ${dbname} -U awsuser -d homebase --rds
+}
+
 lib::db::dump() {
   local dbname=${1:-'homebase_development'}; shift
   local psql_args="$*"
